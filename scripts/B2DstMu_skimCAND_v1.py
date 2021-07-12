@@ -11,18 +11,19 @@ from os.path import join
 import numpy as np
 import pandas as pd
 
+try:
+    from analysis_utilities import getEff
+except ImportError:
+    print >> sys.stderr, "Make sure to source the env.sh file in the repo!"
+    raise
+from progressBar import ProgressBar
+from categoriesDef import categories
+from B02DstMu_selection import candidate_selection, trigger_selection
+
 import ROOT as rt
 rt.gErrorIgnoreLevel = rt.kError
 rt.RooMsgService.instance().setGlobalKillBelow(rt.RooFit.ERROR)
 import root_numpy as rtnp
-
-try:
-    from analysis_utilities import getEff
-except ImportError:
-    print("Make sure to source the env.sh file in the repo!")
-from progressBar import ProgressBar
-from categoriesDef import categories
-from B02DstMu_selection import candidate_selection, trigger_selection
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -739,19 +740,19 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
     os.system('echo '+logfile+';cat '+logfile + ';echo ')
 
 def createSubmissionFile(tmpDir, njobs):
-    print("tmpDir = ", tmpDir)
     fjob = open(tmpDir+'/job.sh', 'w')
     fjob.write('#!/bin/bash\n')
     fjob.write('source /cvmfs/cms.cern.ch/cmsset_default.sh;\n')
     fjob.write('cd %s/RDstAnalysis/CMSSW_10_2_3/;\n' % os.environ['HOME'])
     fjob.write('eval `scramv1 runtime -sh`\n')
     fjob.write('cd %s/RDstAnalysis/BPH_RD_Analysis/\n' % os.environ['HOME'])
-    fjob.write('source env.sh\n')
+    fjob.write('export PYTHONPATH=%s/RDstAnalysis/BPH_RD_Analysis/lib:$PYTHONPATH\n' % os.environ['HOME'])
+    fjob.write('export PYTHONPATH=%s/RDstAnalysis/BPH_RD_Analysis/analysis:$PYTHONPATH\n' % os.environ['HOME'])
     fjob.write('python ./scripts/B2DstMu_skimCAND_v1.py --function makeSel --tmpDir $1 --jN $2\n')
     os.system('chmod +x {}/job.sh'.format(tmpDir))
 
     fsub = open(tmpDir+'/jobs.jdl', 'w')
-    fsub.write('executable    = ' + tmpDir+'/job.sh')
+    fsub.write('executable    = ' + tmpDir + '/job.sh')
     fsub.write('\n')
     fsub.write('arguments     = {} $(ProcId) '.format(tmpDir))
     fsub.write('\n')
