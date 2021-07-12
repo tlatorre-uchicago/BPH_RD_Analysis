@@ -69,8 +69,6 @@ filesLocMap = {
 for key in filesLocMap:
     filesLocMap[key] = join(MCloc,filesLocMap[key],MCend)
 
-print(filesLocMap)
-
 def getTLVfromField(ev, n, idx, mass):
     v = rt.TLorentzVector()
     v.SetPtEtaPhiM(getattr(ev, n+'_pt')[idx],
@@ -514,7 +512,6 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
         N_evts_per_job = 100000
     else:
         d = os.path.dirname(filepath) + '/skimmed/'
-        print("filepath = ", filepath)
         if not os.path.isdir(d):
             print(d)
             os.makedirs(d)
@@ -742,6 +739,7 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
     os.system('echo '+logfile+';cat '+logfile + ';echo ')
 
 def createSubmissionFile(tmpDir, njobs):
+    print("tmpDir = ", tmpDir)
     fjob = open(tmpDir+'/job.sh', 'w')
     fjob.write('#!/bin/bash\n')
     fjob.write('source /cvmfs/cms.cern.ch/cmsset_default.sh;\n')
@@ -832,7 +830,6 @@ if __name__ == "__main__":
         for idx in skip:
             for cn in args.cat:
                 for n, fp in file_loc.iteritems():
-                    print("fp = ", fp)
                     create_dSet(n, fp, categories[cn], skipCut=idx, applyCorrections=args.applyCorr, trkControlRegion=args.trkControlRegion)
     elif args.function == 'makeSel':
         tmpDir = args.tmpDir
