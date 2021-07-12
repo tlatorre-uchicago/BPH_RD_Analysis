@@ -4,10 +4,9 @@
 #############################################################################
 import sys, os, pickle, time, re
 from glob import glob
-sys.path.append('../lib')
-sys.path.append('../analysis')
 from multiprocessing import Pool
 import commands
+from os.path import join
 
 import numpy as np
 import pandas as pd
@@ -17,7 +16,10 @@ rt.gErrorIgnoreLevel = rt.kError
 rt.RooMsgService.instance().setGlobalKillBelow(rt.RooFit.ERROR)
 import root_numpy as rtnp
 
-from analysis_utilities import getEff
+try:
+    from analysis_utilities import getEff
+except ImportError:
+    print("Make sure to source the env.sh file in the repo!")
 from progressBar import ProgressBar
 from categoriesDef import categories
 from B02DstMu_selection import candidate_selection, trigger_selection
@@ -44,7 +46,7 @@ args = parser.parse_args()
 #############################################################################
 root = join(os.environ['HOME'],'BPhysics/data')
 MCloc = join(root,'cmsMC/')
-MCend = '/ntuples_B2DstMu/out_CAND_*.root'
+MCend = 'ntuples_B2DstMu/out_CAND_*.root'
 RDloc = join(root,'cmsRD/ParkingBPH*/')
 
 filesLocMap = {
@@ -66,6 +68,8 @@ filesLocMap = {
 
 for key in filesLocMap:
     filesLocMap[key] = join(MCloc,filesLocMap[key],MCend)
+
+print(filesLocMap)
 
 def getTLVfromField(ev, n, idx, mass):
     v = rt.TLorentzVector()
@@ -510,7 +514,9 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
         N_evts_per_job = 100000
     else:
         d = os.path.dirname(filepath) + '/skimmed/'
+        print("filepath = ", filepath)
         if not os.path.isdir(d):
+            print(d)
             os.makedirs(d)
         fskimmed_name = d + catName
         N_evts_per_job = 30000
@@ -738,9 +744,12 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
 def createSubmissionFile(tmpDir, njobs):
     fjob = open(tmpDir+'/job.sh', 'w')
     fjob.write('#!/bin/bash\n')
-    fjob.write('source /cvmfs/cms.cern.ch/cmsset_default.sh; cd /storage/af/user/ocerri/CMSSW_10_2_3/; eval `scramv1 runtime -sh`\n')
-    fjob.write('cd /storage/af/user/ocerri/BPhysics/scripts\n')
-    fjob.write('python B2DstMu_skimCAND_v1.py --function makeSel --tmpDir $1 --jN $2\n')
+    fjob.write('source /cvmfs/cms.cern.ch/cmsset_default.sh;\n')
+    fjob.write('cd %s/RDstAnalysis/CMSSW_10_2_3/;\n' % os.environ['HOME'])
+    fjob.write('eval `scramv1 runtime -sh`\n')
+    fjob.write('cd %s/RDstAnalysis/BPH_RD_Analysis/\n' % os.environ['HOME'])
+    fjob.write('source env.sh\n')
+    fjob.write('python ./scripts/B2DstMu_skimCAND_v1.py --function makeSel --tmpDir $1 --jN $2\n')
     os.system('chmod +x {}/job.sh'.format(tmpDir))
 
     fsub = open(tmpDir+'/jobs.jdl', 'w')
@@ -823,6 +832,7 @@ if __name__ == "__main__":
         for idx in skip:
             for cn in args.cat:
                 for n, fp in file_loc.iteritems():
+                    print("fp = ", fp)
                     create_dSet(n, fp, categories[cn], skipCut=idx, applyCorrections=args.applyCorr, trkControlRegion=args.trkControlRegion)
     elif args.function == 'makeSel':
         tmpDir = args.tmpDir
