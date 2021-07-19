@@ -81,6 +81,8 @@ def getTLVfromField(ev, n, idx, mass):
 class Container(object):
     pass
 
+hBfieldMapsRatio = None
+
 def get_bFieldCorr3D(phi, eta, verbose=False):
     global hBfieldMapsRatio
     if np.abs(eta) > 2.4:
