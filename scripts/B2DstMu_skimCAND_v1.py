@@ -514,7 +514,6 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
     else:
         d = os.path.dirname(filepath) + '/skimmed/'
         if not os.path.isdir(d):
-            print(d)
             os.makedirs(d)
         fskimmed_name = d + catName
         N_evts_per_job = 30000
