@@ -696,8 +696,8 @@ def createHistograms(category):
 
     def weightsSoftTrackEff(ds, ptList, w=None, s=None, bin=None, size=None):
         if w is None or s is None:
-            weight = binnnedSoftTrackEff(ds[ptList[0]], bin, size)
-            for v in ptList[1:]:
+            weight = np.ones_like(ds['mu_pt'])
+            for v in ptList:
                 tmp = binnnedSoftTrackEff(ds[v], bin, size)
                 if v == 'tkPt_0':
                     sel = ds.N_goodAddTks >= 1
@@ -707,11 +707,16 @@ def createHistograms(category):
                     tmp[~sel] = 1
                 weight *= tmp
         else:
-            weight = fSoftTrackEff(ds[ptList[0]], w, s)
-            for v in ptList[1:]:
-                if v in ('tkPt_0','tkPt_1'):
-                    raise Exception("don't know how to calculate soft track efficiency!")
-                weight *= fSoftTrackEff(ds[v], w, s)
+            weight = np.ones_like(ds['mu_pt'])
+            for v in ptList:
+                tmp = fSoftTrackEff(ds[v], w, s)
+                if v == 'tkPt_0':
+                    sel = ds.N_goodAddTks >= 1
+                    tmp[~sel] = 1
+                elif v == 'tkPt_1':
+                    sel = ds.N_goodAddTks == 2
+                    tmp[~sel] = 1
+                weight *= tmp
         return weight
 
 
