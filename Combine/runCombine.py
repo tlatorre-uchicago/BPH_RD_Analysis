@@ -460,21 +460,23 @@ def loadDatasets(category, loadRD):
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
-        dSet[name]['ctrl2'] = dSet[name]['ctrl']
-        dSet[name]['tkPt_last'] = get_min_pt(dSet[name])
+        if 'data' not in name:
+            dSet[name]['ctrl2'] = dSet[name]['ctrl']
+            dSet[name]['tkPt_last'] = get_min_pt(dSet[name])
 
     for name in dSetTkSide:
         dSetTkSide[name]['ctrl'] = get_ctrl_group(dSetTkSide[name])
-        dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl']
-        dSetTkSide[name]['tkPt_last'] = get_min_pt(dSetTkSide[name])
-        dup = dSetTkSide[name].copy()
-        dup = dup[dup['ctrl'] != 0]
-        dup['ctrl2'] = dup['ctrl']//10
-        if (dup['ctrl2'] == dup['ctrl']).any():
-            raise Exception("ctrl2 == ctrl!")
-        dSetTkSide[name] = pd.concat((dSetTkSide[name],dup[dup['ctrl2'] != 0]))
-        if name in dSet:
-            dSet[name] = pd.concat((dSet[name],dup[dup['ctrl2'] == 0]))
+        if 'data' not in name:
+            dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl']
+            dSetTkSide[name]['tkPt_last'] = get_min_pt(dSetTkSide[name])
+            dup = dSetTkSide[name].copy()
+            dup = dup[dup['ctrl'] != 0]
+            dup['ctrl2'] = dup['ctrl']//10
+            if (dup['ctrl2'] == dup['ctrl']).any():
+                raise Exception("ctrl2 == ctrl!")
+            dSetTkSide[name] = pd.concat((dSetTkSide[name],dup[dup['ctrl2'] != 0]))
+            if name in dSet:
+                dSet[name] = pd.concat((dSet[name],dup[dup['ctrl2'] == 0]))
 
     if args.dumpWeightsTree:
         print 'Skipping on the flight cuts (if any).'
@@ -946,22 +948,23 @@ def createHistograms(category):
         print '\n----------->', n, '<-------------'
         wVar = {}
         weights = {}
-        weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
-            
-        #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
-        # The conditions here are:
-        #
-        #     1. This is an original event with no extra tracks.
-        #     2. This is an original event which got moved.
-        #     3. This is an original event which didn't get moved.
-        #     4. This is a duplicate event which got moved.
-        #     5. This is a duplicate event which didn't get moved.
-        #condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
-        #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-        #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
-        #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-        #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-        #wVar['ctrlUp'] = np.select(condlist,[1,0,1,1,0])
+        if 'data' not in name:
+            weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
+                
+            #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            # The conditions here are:
+            #
+            #     1. This is an original event with no extra tracks.
+            #     2. This is an original event which got moved.
+            #     3. This is an original event which didn't get moved.
+            #     4. This is a duplicate event which got moved.
+            #     5. This is a duplicate event which didn't get moved.
+            #condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
+            #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+            #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
+            #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+            #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+            #wVar['ctrlUp'] = np.select(condlist,[1,0,1,1,0])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1566,21 +1569,22 @@ def createHistograms(category):
         print '\n----------->', n, '<-------------'
         wVar = {}
         weights = {}
-        weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
-        #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
-        # The conditions here are:
-        #
-        #     1. This is an original event with no extra tracks.
-        #     2. This is an original event which got moved.
-        #     3. This is an original event which didn't get moved.
-        #     4. This is a duplicate event which got moved.
-        #     5. This is a duplicate event which didn't get moved.
-        #condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
-        #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-        #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
-        #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-        #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-        #wVar['ctrlUp'] = np.select(condlist,[1,0,1,1,0])
+        if 'data' not in name:
+            weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
+            #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            # The conditions here are:
+            #
+            #     1. This is an original event with no extra tracks.
+            #     2. This is an original event which got moved.
+            #     3. This is an original event which didn't get moved.
+            #     4. This is a duplicate event which got moved.
+            #     5. This is a duplicate event which didn't get moved.
+            #condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
+            #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+            #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
+            #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+            #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+            #wVar['ctrlUp'] = np.select(condlist,[1,0,1,1,0])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
