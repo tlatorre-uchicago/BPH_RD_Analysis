@@ -313,20 +313,24 @@ def cleanPreviousResults():
 ########################### -------- Create histrograms ------------------ #########################
 controlRegSel = {}
 def selfun__TkPlus(ds):
-    sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] > 0)
+    #sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] > 0)
+    sel = ds['ctrl'] == 1
     return sel
 controlRegSel['p_'] = selfun__TkPlus
 
 def selfun__TkMinus(ds):
     sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] < 0)
+    sel = ds['ctrl'] == 2
     return sel
 controlRegSel['m_'] = selfun__TkMinus
 
 def selfun__TkPlusMinus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] >= 2)
+        sel = (ds['ctrl'] == 12) | (ds['ctrl'] == 21) | (ds['ctrl'] == 121) | (ds['ctrl'] == 122) | (ds['ctrl'] == 211) | (ds['ctrl'] == 212)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] == 2)
+        sel = (ds['ctrl'] == 12) | (ds['ctrl'] == 21)
     sel = np.logical_and(ds['massVisTks'] < 5.55, sel)
     return sel
 controlRegSel['pm'] = selfun__TkPlusMinus
@@ -334,8 +338,10 @@ controlRegSel['pm'] = selfun__TkPlusMinus
 def selfun__TkMinusMinus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] >= 2)
+        sel = (ds['ctrl'] == 22) | (ds['ctrl'] == 221) | (ds['ctrl'] == 222)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
+        sel = ds['ctrl'] == 22
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['mm'] = selfun__TkMinusMinus
@@ -343,8 +349,10 @@ controlRegSel['mm'] = selfun__TkMinusMinus
 def selfun__TkPlusPlus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] >= 2)
+        sel = (ds['ctrl'] == 11) | (ds['ctrl'] == 111) | (ds['ctrl'] == 112)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
+        sel = ds['ctrl'] == 11
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['pp'] = selfun__TkPlusPlus
@@ -417,6 +425,12 @@ def loadDatasets(category, loadRD):
         locRD = dataDir+'/skimmed'+args.skimmedTag+'/B2DstMu_{}_{}'.format(creation_date, category.name)
         dSet['data'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
         dSetTkSide['data'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
+
+    for name in dSet:
+        dSet['ctrl'] = np.where(dSet['tkCharge_2'] == -1, 2, dSet['tkCharge_2']) + np.where(dSet['tkCharge_1'] == -1, 2, dSet['tkCharge_2'])*10 + np.where(dSet['tkCharge_0'] == -1, 2, dSet['tkCharge_2'])*100
+
+    for name in dSetTkSide:
+        dSetTkSide['ctrl'] = np.where(dSetTkSide['tkCharge_2'] == -1, 2, dSetTkSide['tkCharge_2']) + np.where(dSetTkSide['tkCharge_1'] == -1, 2, dSetTkSide['tkCharge_2'])*10 + np.where(dSetTkSide['tkCharge_0'] == -1, 2, dSetTkSide['tkCharge_2'])*100
 
     if args.dumpWeightsTree:
         print 'Skipping on the flight cuts (if any).'
