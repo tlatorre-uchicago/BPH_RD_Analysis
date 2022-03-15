@@ -445,11 +445,24 @@ def loadDatasets(category, loadRD):
     #
     # This allows us to compute what would happen if events moved between the
     # control groups.
+    def get_ctrl_group(ds):
+        return np.where(ds['tkCharge_2'] == -1, 2, ds['tkCharge_2']) + \
+               np.where(ds['tkCharge_1'] == -1, 2, ds['tkCharge_1'])*10 + \
+               np.where(ds['tkCharge_0'] == -1, 2, ds['tkCharge_0'])*100
+
     for name in dSet:
-        dSet[name]['ctrl'] = np.where(dSet[name]['tkCharge_2'] == -1, 2, dSet[name]['tkCharge_2']) + np.where(dSet[name]['tkCharge_1'] == -1, 2, dSet[name]['tkCharge_1'])*10 + np.where(dSet[name]['tkCharge_0'] == -1, 2, dSet[name]['tkCharge_0'])*100
+        dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
+        dSet[name]['ctrl2'] = dSet[name]['ctrl2']
+        dup = dSet[name].copy()
+        dup['ctrl2'] = dup['ctrl'] - dup['ctrl'] % 10
+        dSet[name] = pd.concat((dSet[name],dup))
 
     for name in dSetTkSide:
-        dSetTkSide[name]['ctrl'] = np.where(dSetTkSide[name]['tkCharge_2'] == -1, 2, dSetTkSide[name]['tkCharge_2']) + np.where(dSetTkSide[name]['tkCharge_1'] == -1, 2, dSetTkSide[name]['tkCharge_1'])*10 + np.where(dSetTkSide[name]['tkCharge_0'] == -1, 2, dSetTkSide[name]['tkCharge_0'])*100
+        dSetTkSide[name]['ctrl'] = get_ctrl_group(dSetTkSide[name])
+        dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl2']
+        dup = dSetTkSide[name].copy()
+        dup['ctrl2'] = dup['ctrl'] - dup['ctrl'] % 10
+        dSetTkSide[name] = pd.concat((dSetTkSide[name],dup))
 
     if args.dumpWeightsTree:
         print 'Skipping on the flight cuts (if any).'
@@ -918,6 +931,7 @@ def createHistograms(category):
         print '\n----------->', n, '<-------------'
         wVar = {}
         weights = {}
+        weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
