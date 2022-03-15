@@ -953,7 +953,7 @@ def createHistograms(category):
         print '\n----------->', n, '<-------------'
         wVar = {}
         weights = {}
-        if 'data' not in name:
+        if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
                 
             #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
@@ -1574,7 +1574,7 @@ def createHistograms(category):
         print '\n----------->', n, '<-------------'
         wVar = {}
         weights = {}
-        if 'data' not in name:
+        if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
             #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
             # The conditions here are:
