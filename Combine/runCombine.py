@@ -314,23 +314,23 @@ def cleanPreviousResults():
 controlRegSel = {}
 def selfun__TkPlus(ds):
     #sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] > 0)
-    sel = ds['ctrl'] == 1
+    sel = ds['ctrl'] == 100
     return sel
 controlRegSel['p_'] = selfun__TkPlus
 
 def selfun__TkMinus(ds):
     sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] < 0)
-    sel = ds['ctrl'] == 2
+    sel = ds['ctrl'] == 200
     return sel
 controlRegSel['m_'] = selfun__TkMinus
 
 def selfun__TkPlusMinus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl'] == 12) | (ds['ctrl'] == 21) | (ds['ctrl'] == 121) | (ds['ctrl'] == 122) | (ds['ctrl'] == 211) | (ds['ctrl'] == 212)
+        sel = (ds['ctrl']//10 == 12) | (ds['ctrl']//10 == 21)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] == 2)
-        sel = (ds['ctrl'] == 12) | (ds['ctrl'] == 21)
+        sel = (ds['ctrl'] == 120) | (ds['ctrl'] == 210)
     sel = np.logical_and(ds['massVisTks'] < 5.55, sel)
     return sel
 controlRegSel['pm'] = selfun__TkPlusMinus
@@ -338,10 +338,10 @@ controlRegSel['pm'] = selfun__TkPlusMinus
 def selfun__TkMinusMinus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl'] == 22) | (ds['ctrl'] == 221) | (ds['ctrl'] == 222)
+        sel = (ds['ctrl']//10 == 22)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
-        sel = ds['ctrl'] == 22
+        sel = ds['ctrl'] == 220
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['mm'] = selfun__TkMinusMinus
@@ -349,10 +349,10 @@ controlRegSel['mm'] = selfun__TkMinusMinus
 def selfun__TkPlusPlus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl'] == 11) | (ds['ctrl'] == 111) | (ds['ctrl'] == 112)
+        sel = (ds['ctrl']//10 == 11)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
-        sel = ds['ctrl'] == 11
+        sel = ds['ctrl'] == 110
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['pp'] = selfun__TkPlusPlus
