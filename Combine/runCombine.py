@@ -323,19 +323,28 @@ def selfun__TkMinus(ds):
 controlRegSel['m_'] = selfun__TkMinus
 
 def selfun__TkPlusMinus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] >= 2)
+    if any('MC' in name for name in ds.columns):
+        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] >= 2)
+    else:
+        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] == 2)
     sel = np.logical_and(ds['massVisTks'] < 5.55, sel)
     return sel
 controlRegSel['pm'] = selfun__TkPlusMinus
 
 def selfun__TkMinusMinus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] >= 2)
+    if any('MC' in name for name in ds.columns):
+        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] >= 2)
+    else:
+        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['mm'] = selfun__TkMinusMinus
 
 def selfun__TkPlusPlus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] >= 2)
+    if any('MC' in name for name in ds.columns):
+        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] >= 2)
+    else:
+        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['pp'] = selfun__TkPlusPlus
@@ -696,7 +705,7 @@ def createHistograms(category):
 
     def binnnedSoftTrackMiss(x, bin, size):
         sel = np.logical_or(x < softPtUnc[bin][0], x > softPtUnc[bin][1])
-        if size > 0:
+        if size >= 0:
             return np.where(sel, np.ones_like(x), 0)
         else:
             return np.where(sel, np.ones_like(x), -size*softPtUnc[bin][2])
@@ -716,6 +725,7 @@ def createHistograms(category):
                     tmp = binnnedSoftTrackMiss(ds[v], bin, size)
                     sel = ds.N_goodAddTks >= 3
                     tmp[~sel] = 1
+                    tmp[ds['tkPt_2'] > 2.0] = 0
                 weight *= tmp
         else:
             weight = np.ones_like(ds['mu_pt'])
@@ -954,6 +964,7 @@ def createHistograms(category):
             for nBin in range(len(softPtUnc)):
                 refPt = '{:.0f}'.format(np.round(np.mean(softPtUnc[nBin][:-1])*1e3))
                 wVar['softTrkEff_'+refPt+'Up'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=+1)
+                weights['softTrkEff_'+refPt] = weightsSoftTrackEff(ds, partList, bin=nBin, size=0)
                 wVar['softTrkEff_'+refPt+'Down'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=-1)
 
 
@@ -1547,6 +1558,7 @@ def createHistograms(category):
             for nBin in range(len(softPtUnc)):
                 refPt = '{:.0f}'.format(np.round(np.mean(softPtUnc[nBin][:-1])*1e3))
                 wVar['softTrkEff_'+refPt+'Up'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=+1)
+                weights['softTrkEff_'+refPt] = weightsSoftTrackEff(ds, partList, bin=nBin, size=0)
                 wVar['softTrkEff_'+refPt+'Down'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=-1)
 
             ############################
