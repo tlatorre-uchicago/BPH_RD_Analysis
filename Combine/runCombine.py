@@ -426,6 +426,25 @@ def loadDatasets(category, loadRD):
         dSet['data'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
         dSetTkSide['data'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
 
+    # Add a column specifying the control region. Here, the control region
+    # number is sort of like the control region expressed as an integer. It is
+    # a three digit number where the number in the least significant digit
+    # represents the charge of the first track (1 for positive, 2 for
+    # negative), the next digit represents the charge of the second track, etc.
+    #
+    # For example, ctrl == 0 represents the signal region, ctrl == 200
+    # represents the minus control region, etc.
+    #
+    # The nice thing about this representation is that if you want to find out
+    # what would happen if you didn't reconstruct the lowest pt track, you can
+    # just compute ctrl - ctrl % 10. For example:
+    #
+    #     >>> ctrl = 222
+    #     >>> ctrl - ctrl % 10
+    #     220
+    #
+    # This allows us to compute what would happen if events moved between the
+    # control groups.
     for name in dSet:
         dSet['ctrl'] = np.where(dSet['tkCharge_2'] == -1, 2, dSet['tkCharge_2']) + np.where(dSet['tkCharge_1'] == -1, 2, dSet['tkCharge_2'])*10 + np.where(dSet['tkCharge_0'] == -1, 2, dSet['tkCharge_2'])*100
 
