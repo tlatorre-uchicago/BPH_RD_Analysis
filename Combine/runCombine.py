@@ -455,10 +455,11 @@ def loadDatasets(category, loadRD):
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
+        dSet[name]['ctrl2'] = dSet[name]['ctrl']
 
     for name in dSetTkSide:
         dSetTkSide[name]['ctrl'] = get_ctrl_group(dSetTkSide[name])
-        dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl2']
+        dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl']
         dup = dSetTkSide[name].copy()
         dup = dup[dup['ctrl'] != 0]
         dup['ctrl2'] = dup['ctrl']//10
