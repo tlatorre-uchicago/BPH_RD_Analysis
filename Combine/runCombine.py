@@ -453,16 +453,25 @@ def loadDatasets(category, loadRD):
         choicelist = np.array([np.zeros_like(tk0),tk0,tk0*10+tk1,tk0*100+tk1*10+tk2,tk0*100+tk1*10+tk2])
         return np.select(condlist,choicelist)
 
+    def get_min_pt(ds):
+        condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
+        choicelist = np.array([np.zeros_like(tk0),ds['tkPt_0'],ds['tkPt_1'],ds['tkPt_2'],ds['tkPt_2'])
+        return np.select(condlist,choicelist)
+
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
         dSet[name]['ctrl2'] = dSet[name]['ctrl']
+        dSet[name]['tkPt_last'] = get_min_pt(dSet[name])
 
     for name in dSetTkSide:
         dSetTkSide[name]['ctrl'] = get_ctrl_group(dSetTkSide[name])
         dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl']
+        dSetTkSide[name]['tkPt_last'] = get_min_pt(dSetTkSide[name])
         dup = dSetTkSide[name].copy()
         dup = dup[dup['ctrl'] != 0]
         dup['ctrl2'] = dup['ctrl']//10
+        if (dup['ctrl2'] == dup['ctrl']).any():
+            raise Exception("ctrl2 == ctrl!")
         dSetTkSide[name] = pd.concat((dSetTkSide[name],dup[dup['ctrl2'] != 0]))
         if name in dSet:
             dSet[name] = pd.concat((dSet[name],dup[dup['ctrl2'] == 0]))
@@ -925,6 +934,9 @@ def createHistograms(category):
     print 'Signal region observables divided in q2 bins', len(observables_q2bins), ':', ' '.join(observables_q2bins)
     print 'Signal region observables integrated in q2', len(observables_q2integrated), ':', ' '.join(observables_q2integrated)
 
+    def get_ctrl_weights(ds,pt_cut):
+        weights = np.ones_like(ds['mu_pt'])
+
 
     totalCounting = [0,0]
     print '---------> Fill signal region histograms'
@@ -935,6 +947,9 @@ def createHistograms(category):
         wVar = {}
         weights = {}
         weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+        #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+        #condlist = [ds['ctrl'] == ds['ctrl2'],(ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),(ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+        #wVar['ctrlUp'] = np.select(condlist,[1,1,0])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1540,6 +1555,9 @@ def createHistograms(category):
         wVar = {}
         weights = {}
         weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+        #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+        #condlist = [ds['ctrl'] == ds['ctrl2'],(ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),(ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+        #wVar['ctrlUp'] = np.select(condlist,[1,1,0])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
