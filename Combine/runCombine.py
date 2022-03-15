@@ -760,7 +760,7 @@ def createHistograms(category):
 
     histo = {}
     eventCountingStr = {}
-    data_over_MC_overallNorm = 1.0
+    data_over_MC_overallNorm = 0.7
 
     ######################################################
     ########## Signal region
