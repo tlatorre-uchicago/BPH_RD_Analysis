@@ -446,10 +446,10 @@ def loadDatasets(category, loadRD):
     # This allows us to compute what would happen if events moved between the
     # control groups.
     for name in dSet:
-        dSet['ctrl'] = np.where(dSet['tkCharge_2'] == -1, 2, dSet['tkCharge_2']) + np.where(dSet['tkCharge_1'] == -1, 2, dSet['tkCharge_2'])*10 + np.where(dSet['tkCharge_0'] == -1, 2, dSet['tkCharge_2'])*100
+        dSet[name]['ctrl'] = np.where(dSet[name]['tkCharge_2'] == -1, 2, dSet[name]['tkCharge_2']) + np.where(dSet[name]['tkCharge_1'] == -1, 2, dSet[name]['tkCharge_2'])*10 + np.where(dSet[name]['tkCharge_0'] == -1, 2, dSet[name]['tkCharge_2'])*100
 
     for name in dSetTkSide:
-        dSetTkSide['ctrl'] = np.where(dSetTkSide['tkCharge_2'] == -1, 2, dSetTkSide['tkCharge_2']) + np.where(dSetTkSide['tkCharge_1'] == -1, 2, dSetTkSide['tkCharge_2'])*10 + np.where(dSetTkSide['tkCharge_0'] == -1, 2, dSetTkSide['tkCharge_2'])*100
+        dSetTkSide[name]['ctrl'] = np.where(dSetTkSide[name]['tkCharge_2'] == -1, 2, dSetTkSide[name]['tkCharge_2']) + np.where(dSetTkSide[name]['tkCharge_1'] == -1, 2, dSetTkSide[name]['tkCharge_2'])*10 + np.where(dSetTkSide[name]['tkCharge_0'] == -1, 2, dSetTkSide[name]['tkCharge_2'])*100
 
     if args.dumpWeightsTree:
         print 'Skipping on the flight cuts (if any).'
