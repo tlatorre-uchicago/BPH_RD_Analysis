@@ -455,17 +455,16 @@ def loadDatasets(category, loadRD):
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
-        dSet[name]['ctrl2'] = dSet[name]['ctrl2']
-        dup = dSet[name].copy()
-        dup['ctrl2'] = dup['ctrl']//10
-        dSet[name] = pd.concat((dSet[name],dup))
 
     for name in dSetTkSide:
         dSetTkSide[name]['ctrl'] = get_ctrl_group(dSetTkSide[name])
         dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl2']
         dup = dSetTkSide[name].copy()
+        dup = dup[dup['ctrl'] != 0]
         dup['ctrl2'] = dup['ctrl']//10
-        dSetTkSide[name] = pd.concat((dSetTkSide[name],dup))
+        dSetTkSide[name] = pd.concat((dSetTkSide[name],dup[dup['ctrl2'] != 0]))
+        if name in dSet:
+            dSet[name] = pd.concat((dSet[name],dup[dup['ctrl2'] == 0]))
 
     if args.dumpWeightsTree:
         print 'Skipping on the flight cuts (if any).'
@@ -1539,6 +1538,7 @@ def createHistograms(category):
         print '\n----------->', n, '<-------------'
         wVar = {}
         weights = {}
+        weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
