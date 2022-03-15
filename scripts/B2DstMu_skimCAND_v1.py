@@ -78,7 +78,7 @@ MC_samples = ['Bd_MuNuDst',
               'Bs_MuNuDstK',        'Bs_TauNuDstK',
               'Bd_DstDu',           'Bd_DstDd',          'Bd_DstDs',
               'Bu_DstDu',           'Bu_DstDd',          'Bs_DstDs',
-              'Bd_DDs1',            'Bu_DDs1',           'B_DstDXX',
+              'Bd_DDs1',            'Bu_DDs1',#           'B_DstDXX',
               # Others
               # 'DstKu_KuToMu',
               # 'Mu_Enriched'
@@ -357,9 +357,9 @@ def extractEventInfos(j, ev, corr=None):
         p4_tks.append(rt.TLorentzVector())
 
     p4_vis_wTks = p4_vis + p4_sumGoodTks
-    e.massHadTks1 = (p4_vis + p4_tks[0]).M()
-    e.massHadTks2 = (p4_vis + p4_tks[0] + p4_tks[1]).M()
-    e.massHadTks3 = (p4_vis + p4_tks[0] + p4_tks[1] + p4_tks[2]).M()
+    e.massVisTks1 = (p4_vis + p4_tks[0]).M()
+    e.massVisTks2 = (p4_vis + p4_tks[0] + p4_tks[1]).M()
+    e.massVisTks3 = (p4_vis + p4_tks[0] + p4_tks[1] + p4_tks[2]).M()
     e.massVisTks = p4_vis_wTks.M()
     e.massHadTks = (p4_Dst + p4_sumGoodTks).M()
     e.massHadTks1 = (p4_Dst + p4_tks[0]).M()
