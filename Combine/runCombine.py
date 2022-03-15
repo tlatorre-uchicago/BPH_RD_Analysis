@@ -760,7 +760,7 @@ def createHistograms(category):
 
     histo = {}
     eventCountingStr = {}
-    data_over_MC_overallNorm = 0.7
+    data_over_MC_overallNorm = 1.0
 
     ######################################################
     ########## Signal region
@@ -1585,16 +1585,16 @@ def createHistograms(category):
             weights['randTksPU'], wVar['randTksPU'+aux+'Up'], wVar['randTksPU'+aux+'Down'] = computeRandomTracksWeights(ds, relScale=0.5, centralVal=1.3, kind='PU')
             print 'Average random tracks from PU weight: {:.2f}'.format(np.mean(weights['randTksPU']))
 
-            #print 'Including additional tracks pT corrections'
-            #cname = 'addTk_pt_cali_'+category.name
-            #w, auxVarDic = computeKinCalWeights(ds, 'tkPt_0', cname, cal_addTK_pt)
-            ## Apply it only if they are not from main B
-            #sel = ds['MC_tkFromMainB_0'] < 0.5
-            #print 'Affecting {:.1f}% of additional tracks'.format(100*np.sum(ds['MC_tkFromMainB_0'] < 0.5)/float(ds.shape[0]))
-            #weights[cname] = np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
-            #print 'Normalization change: {:.3f}'.format(np.sum(weights[cname])/ float(weights[cname].shape[0]))
-            #for k in auxVarDic.keys():
-            #    wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
+            print 'Including additional tracks pT corrections'
+            cname = 'addTk_pt_cali_'+category.name
+            w, auxVarDic = computeKinCalWeights(ds, 'tkPt_0', cname, cal_addTK_pt)
+            # Apply it only if they are not from main B
+            sel = ds['MC_tkFromMainB_0'] < 0.5
+            print 'Affecting {:.1f}% of additional tracks'.format(100*np.sum(ds['MC_tkFromMainB_0'] < 0.5)/float(ds.shape[0]))
+            weights[cname] = np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
+            print 'Normalization change: {:.3f}'.format(np.sum(weights[cname])/ float(weights[cname].shape[0]))
+            for k in auxVarDic.keys():
+                wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
 
         ############################
         # Form factor correction
