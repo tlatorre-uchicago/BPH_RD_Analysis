@@ -455,7 +455,7 @@ def loadDatasets(category, loadRD):
 
     def get_min_pt(ds):
         condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
-        choicelist = np.array([np.zeros_like(tk0),ds['tkPt_0'],ds['tkPt_1'],ds['tkPt_2'],ds['tkPt_2'])
+        choicelist = np.array([np.zeros_like(ds['tkPt_0']),ds['tkPt_0'],ds['tkPt_1'],ds['tkPt_2'],ds['tkPt_2']])
         return np.select(condlist,choicelist)
 
     for name in dSet:
@@ -947,9 +947,21 @@ def createHistograms(category):
         wVar = {}
         weights = {}
         weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            
         #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
-        #condlist = [ds['ctrl'] == ds['ctrl2'],(ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),(ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-        #wVar['ctrlUp'] = np.select(condlist,[1,1,0])
+        # The conditions here are:
+        #
+        #     1. This is an original event with no extra tracks.
+        #     2. This is an original event which got moved.
+        #     3. This is an original event which didn't get moved.
+        #     4. This is a duplicate event which got moved.
+        #     5. This is a duplicate event which didn't get moved.
+        #condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
+        #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+        #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
+        #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+        #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+        #wVar['ctrlUp'] = np.select(condlist,[1,0,1,1,0])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1556,8 +1568,19 @@ def createHistograms(category):
         weights = {}
         weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
         #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
-        #condlist = [ds['ctrl'] == ds['ctrl2'],(ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),(ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-        #wVar['ctrlUp'] = np.select(condlist,[1,1,0])
+        # The conditions here are:
+        #
+        #     1. This is an original event with no extra tracks.
+        #     2. This is an original event which got moved.
+        #     3. This is an original event which didn't get moved.
+        #     4. This is a duplicate event which got moved.
+        #     5. This is a duplicate event which didn't get moved.
+        #condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
+        #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+        #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
+        #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+        #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+        #wVar['ctrlUp'] = np.select(condlist,[1,0,1,1,0])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
