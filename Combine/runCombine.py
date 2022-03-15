@@ -460,20 +460,25 @@ def loadDatasets(category, loadRD):
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
-        if 'data' not in name:
-            dSet[name]['ctrl2'] = dSet[name]['ctrl']
-            dSet[name]['tkPt_last'] = get_min_pt(dSet[name])
+        dSet[name]['ctrl2'] = dSet[name]['ctrl']
+        dSet[name]['tkPt_last'] = get_min_pt(dSet[name])
 
     for name in dSetTkSide:
         dSetTkSide[name]['ctrl'] = get_ctrl_group(dSetTkSide[name])
+        dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl']
+        dSetTkSide[name]['tkPt_last'] = get_min_pt(dSetTkSide[name])
         if 'data' not in name:
-            dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl']
-            dSetTkSide[name]['tkPt_last'] = get_min_pt(dSetTkSide[name])
+            # Here is where we duplicate the MC to allow us to move events
+            # between control regions.
             dup = dSetTkSide[name].copy()
             dup = dup[dup['ctrl'] != 0]
             dup['ctrl2'] = dup['ctrl']//10
+            # Make sure we didn't accidentally copy any events which don't
+            # move.
             if (dup['ctrl2'] == dup['ctrl']).any():
                 raise Exception("ctrl2 == ctrl!")
+            # Now put events in the correct dictionary since we have separate
+            # dictionaries for the signal and track control regions
             dSetTkSide[name] = pd.concat((dSetTkSide[name],dup[dup['ctrl2'] != 0]))
             if name in dSet:
                 dSet[name] = pd.concat((dSet[name],dup[dup['ctrl2'] == 0]))
