@@ -314,23 +314,23 @@ def cleanPreviousResults():
 controlRegSel = {}
 def selfun__TkPlus(ds):
     #sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] > 0)
-    sel = ds['ctrl'] == 100
+    sel = ds['ctrl'] == 1
     return sel
 controlRegSel['p_'] = selfun__TkPlus
 
 def selfun__TkMinus(ds):
     sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] < 0)
-    sel = ds['ctrl'] == 200
+    sel = ds['ctrl'] == 2
     return sel
 controlRegSel['m_'] = selfun__TkMinus
 
 def selfun__TkPlusMinus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl']//10 == 12) | (ds['ctrl']//10 == 21)
+        sel = (ds['ctrl'] == 12) | (ds['ctrl'] == 21) | (ds['ctrl']//10 == 12) | (ds['ctrl']//10 == 21)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] == 2)
-        sel = (ds['ctrl'] == 120) | (ds['ctrl'] == 210)
+        sel = (ds['ctrl'] == 12) | (ds['ctrl'] == 21)
     sel = np.logical_and(ds['massVisTks'] < 5.55, sel)
     return sel
 controlRegSel['pm'] = selfun__TkPlusMinus
@@ -338,10 +338,10 @@ controlRegSel['pm'] = selfun__TkPlusMinus
 def selfun__TkMinusMinus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl']//10 == 22)
+        sel = (ds['ctrl'] == 22) | (ds['ctrl']//10 == 22)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
-        sel = ds['ctrl'] == 220
+        sel = ds['ctrl'] == 22
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['mm'] = selfun__TkMinusMinus
@@ -349,10 +349,10 @@ controlRegSel['mm'] = selfun__TkMinusMinus
 def selfun__TkPlusPlus(ds):
     if any('MC' in name for name in ds.columns):
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl']//10 == 11)
+        sel = (ds['ctrl'] == 11) | (ds['ctrl']//10 == 11)
     else:
         sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
-        sel = ds['ctrl'] == 110
+        sel = ds['ctrl'] == 11
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['pp'] = selfun__TkPlusPlus
@@ -437,31 +437,34 @@ def loadDatasets(category, loadRD):
     #
     # The nice thing about this representation is that if you want to find out
     # what would happen if you didn't reconstruct the lowest pt track, you can
-    # just compute ctrl - ctrl % 10. For example:
+    # just compute ctrl//10. For example:
     #
     #     >>> ctrl = 222
-    #     >>> ctrl - ctrl % 10
-    #     220
+    #     >>> ctrl//10
+    #     22
     #
     # This allows us to compute what would happen if events moved between the
     # control groups.
     def get_ctrl_group(ds):
-        return np.where(ds['tkCharge_2'] == -1, 2, ds['tkCharge_2']) + \
-               np.where(ds['tkCharge_1'] == -1, 2, ds['tkCharge_1'])*10 + \
-               np.where(ds['tkCharge_0'] == -1, 2, ds['tkCharge_0'])*100
+        tk0 = np.where(ds['tkCharge_0'] == -1, 2, ds['tkCharge_0'])
+        tk1 = np.where(ds['tkCharge_1'] == -1, 2, ds['tkCharge_1'])
+        tk2 = np.where(ds['tkCharge_2'] == -1, 2, ds['tkCharge_2'])
+        condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
+        choicelist = np.array([np.zeros_like(tk0),tk0,tk0*10+tk1,tk0*100+tk1*10+tk2,tk0*100+tk1*10+tk2])
+        return np.select(condlist,choicelist)
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
         dSet[name]['ctrl2'] = dSet[name]['ctrl2']
         dup = dSet[name].copy()
-        dup['ctrl2'] = dup['ctrl'] - dup['ctrl'] % 10
+        dup['ctrl2'] = dup['ctrl']//10
         dSet[name] = pd.concat((dSet[name],dup))
 
     for name in dSetTkSide:
         dSetTkSide[name]['ctrl'] = get_ctrl_group(dSetTkSide[name])
         dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl2']
         dup = dSetTkSide[name].copy()
-        dup['ctrl2'] = dup['ctrl'] - dup['ctrl'] % 10
+        dup['ctrl2'] = dup['ctrl']//10
         dSetTkSide[name] = pd.concat((dSetTkSide[name],dup))
 
     if args.dumpWeightsTree:
