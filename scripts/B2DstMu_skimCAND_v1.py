@@ -355,10 +355,6 @@ def extractEventInfos(j, ev, corr=None):
 
     while len(p4_tks) < 3:
         p4_tks.append(rt.TLorentzVector())
-        
-
-    
-
 
     p4_vis_wTks = p4_vis + p4_sumGoodTks
     e.massHadTks1 = (p4_vis + p4_tks[0]).M()
