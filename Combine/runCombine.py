@@ -3006,6 +3006,8 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
             n = k[k.find('__')+2:-2]
             card += n+' shape' + mcProcStr*nCat + '\n'
 
+    card += 'ctrl shape' + mcProcStr*nCat + '\n'
+
     # B eta uncertainty
     names = []
     for k in histo.values()[0].keys():
