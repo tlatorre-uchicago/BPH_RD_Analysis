@@ -1659,7 +1659,7 @@ def createHistograms(category):
             weights['muonIdSF'], _, _ = computeMuonIDSF(ds)
 
             print 'Including soft track pT corrections'
-            partList = ['K_pt', 'pi_pt', 'pis_pt', 'tkPt_0', 'tkPt_1','tkPt_2']
+            partList = ['K_pt', 'pi_pt', 'pis_pt']
             for nBin in range(len(softPtUnc)):
                 refPt = '{:.0f}'.format(np.round(np.mean(softPtUnc[nBin][:-1])*1e3))
                 wVar['softTrkEff_'+refPt+'Up'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=+1)
