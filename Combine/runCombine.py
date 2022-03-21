@@ -313,33 +313,28 @@ def cleanPreviousResults():
 ########################### -------- Create histrograms ------------------ #########################
 controlRegSel = {}
 def selfun__TkPlus(ds):
-    #sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] > 0)
     sel = ds['ctrl2'] == 1
     return sel
 controlRegSel['p_'] = selfun__TkPlus
 
 def selfun__TkMinus(ds):
-    sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] < 0)
     sel = ds['ctrl2'] == 2
     return sel
 controlRegSel['m_'] = selfun__TkMinus
 
 def selfun__TkPlusMinus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] >= 2)
     sel = (ds['ctrl2'] == 12) | (ds['ctrl2'] == 21)
     sel = np.logical_and(ds['massVisTks'] < 5.55, sel)
     return sel
 controlRegSel['pm'] = selfun__TkPlusMinus
 
 def selfun__TkMinusMinus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
     sel = ds['ctrl2'] == 22
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['mm'] = selfun__TkMinusMinus
 
 def selfun__TkPlusPlus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
     sel = ds['ctrl2'] == 11
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
@@ -918,9 +913,6 @@ def createHistograms(category):
     print 'Signal region observables divided in q2 bins', len(observables_q2bins), ':', ' '.join(observables_q2bins)
     print 'Signal region observables integrated in q2', len(observables_q2integrated), ':', ' '.join(observables_q2integrated)
 
-    def get_ctrl_weights(ds,pt_cut):
-        weights = np.ones_like(ds['mu_pt'])
-
 
     totalCounting = [0,0]
     print '---------> Fill signal region histograms'
@@ -932,7 +924,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
-                
+
             wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
             # The conditions here are:
             #
