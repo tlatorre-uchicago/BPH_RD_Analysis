@@ -78,7 +78,7 @@ MC_samples = ['Bd_MuNuDst',
               'Bs_MuNuDstK',        'Bs_TauNuDstK',
               'Bd_DstDu',           'Bd_DstDd',          'Bd_DstDs',
               'Bu_DstDu',           'Bu_DstDd',          'Bs_DstDs',
-              'Bd_DDs1',            'Bu_DDs1',#           'B_DstDXX',
+              'Bd_DDs1',            'Bu_DDs1',           'B_DstDXX',
               # Others
               # 'DstKu_KuToMu',
               # 'Mu_Enriched'
