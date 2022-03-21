@@ -1174,7 +1174,7 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
                 p = Pool(min(15,len(inputs)))
                 outputs = p.map(makeSelection, inputs)
             elif args.parallelType == 'jobs':
-                tmpDir = 'tmp/B2DstMu_skimCAND_' + n
+                tmpDir = 'tmp/B2DstMu_skimCAND_%s_%s' % (n,catName)
                 if trkControlRegion:
                     tmpDir += '_trkControl'
                 os.system('rm -rf ' + tmpDir + '/out')
