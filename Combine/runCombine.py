@@ -311,31 +311,53 @@ def cleanPreviousResults():
 
 
 ########################### -------- Create histrograms ------------------ #########################
+
+
 controlRegSel = {}
 def selfun__TkPlus(ds):
+    sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] > 0)
+    sel2 = sel & (ds['ctrl'] == ds['ctrl2'])
     sel = ds['ctrl2'] == 1
+    sel3 = sel & (ds['ctrl'] == ds['ctrl2'])
+    assert((sel2 == sel3).all())
     return sel
 controlRegSel['p_'] = selfun__TkPlus
 
 def selfun__TkMinus(ds):
+    sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] < 0)
+    sel2 = sel & (ds['ctrl'] == ds['ctrl2'])
     sel = ds['ctrl2'] == 2
+    sel3 = sel & (ds['ctrl'] == ds['ctrl2'])
+    assert((sel2 == sel3).all())
     return sel
 controlRegSel['m_'] = selfun__TkMinus
 
 def selfun__TkPlusMinus(ds):
+    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] == 2)
+    sel2 = sel & (ds['ctrl'] == ds['ctrl2'])
     sel = (ds['ctrl2'] == 12) | (ds['ctrl2'] == 21)
+    sel3 = sel & (ds['ctrl'] == ds['ctrl2'])
+    assert((sel2 == sel3).all())
     sel = np.logical_and(ds['massVisTks'] < 5.55, sel)
     return sel
 controlRegSel['pm'] = selfun__TkPlusMinus
 
 def selfun__TkMinusMinus(ds):
+    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
+    sel2 = sel & (ds['ctrl'] == ds['ctrl2'])
     sel = ds['ctrl2'] == 22
+    sel3 = sel & (ds['ctrl'] == ds['ctrl2'])
+    assert((sel2 == sel3).all())
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['mm'] = selfun__TkMinusMinus
 
 def selfun__TkPlusPlus(ds):
+    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
+    sel2 = sel & (ds['ctrl'] == ds['ctrl2'])
     sel = ds['ctrl2'] == 11
+    sel3 = sel & (ds['ctrl'] == ds['ctrl2'])
+    assert((sel2 == sel3).all())
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['pp'] = selfun__TkPlusPlus
@@ -459,11 +481,11 @@ def loadDatasets(category, loadRD):
             dup['ctrl2'] = dup['ctrl']//10
             # Set the massHadTks and massVisTks column equal to what it would
             # be had we missed the last track.
-            condlist = [dup['ctrl2'] == 0, dup['ctrl2'] < 10, dup['ctrl2'] < 100, dup['ctrl2'] >= 100]
-            choicelist = [dup['massHadTks1'], dup['massHadTks1'], dup['massHadTks2'], dup['massHadTks2']]
-            dup['massHadTks'] = np.select(condlist,choicelist)
-            choicelist = [dup['massVisTks1'], dup['massVisTks1'], dup['massVisTks2'], dup['massVisTks2']]
-            dup['massVisTks'] = np.select(condlist,choicelist)
+            #condlist = [dup['ctrl2'] == 0, dup['ctrl2'] < 10, dup['ctrl2'] < 100, dup['ctrl2'] >= 100]
+            #choicelist = [dup['massHadTks1'], dup['massHadTks1'], dup['massHadTks2'], dup['massHadTks2']]
+            #dup['massHadTks'] = np.select(condlist,choicelist)
+            #choicelist = [dup['massVisTks1'], dup['massVisTks1'], dup['massVisTks2'], dup['massVisTks2']]
+            #dup['massVisTks'] = np.select(condlist,choicelist)
             # Make sure we didn't accidentally copy any events which don't
             # move.
             if (dup['ctrl2'] == dup['ctrl']).any():
@@ -942,7 +964,7 @@ def createHistograms(category):
         if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
 
-            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
             # The conditions here are:
             #
             #     1. This is an original event with no extra tracks.
@@ -955,7 +977,7 @@ def createHistograms(category):
                         (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
                         (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
                         (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
+            #wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1554,7 +1576,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
-            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
             # The conditions here are:
             #
             #     1. This is an original event with no extra tracks.
@@ -1567,7 +1589,7 @@ def createHistograms(category):
                         (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
                         (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
                         (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
+            #wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
@@ -1587,6 +1609,7 @@ def createHistograms(category):
                 eff[0] *= corrScaleFactors[n+'_tk']
                 print 'Using scale factor from a posteriori selection: {:.3f}'.format(corrScaleFactors[n+'_tk'])
             nTotExp = nGenExp*eff[0]
+            print("nTotExp = %.4f*%.4f = %.4f" % (nGenExp,eff[0],nTotExp))
 
             print 'Including pileup reweighting'
             weights['pileup'] = puReweighter.getPileupWeights(ds['MC_nInteractions'])
@@ -1633,7 +1656,7 @@ def createHistograms(category):
             weights['muonIdSF'], _, _ = computeMuonIDSF(ds)
 
             print 'Including soft track pT corrections'
-            partList = ['K_pt', 'pi_pt', 'pis_pt']
+            partList = ['K_pt', 'pi_pt', 'pis_pt','tkPt_0','tkPt_1']
             for nBin in range(len(softPtUnc)):
                 refPt = '{:.0f}'.format(np.round(np.mean(softPtUnc[nBin][:-1])*1e3))
                 wVar['softTrkEff_'+refPt+'Up'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=+1)
@@ -1954,7 +1977,9 @@ def createHistograms(category):
 
         print 'Computing total weights'
         weightsCentral = np.ones_like(ds['q2'])
-        for w in weights.values():
+        orig = ds['ctrl'] == ds['ctrl2']
+        for k, w in weights.iteritems():
+            print("avg, min, max value for %s %.8f %.8f %.8f" % (k,np.mean(w[orig]), np.min(w[orig]), np.max(w[orig])))
             weightsCentral *= w
         wVar[''] = np.ones_like(weightsCentral)
 
@@ -1991,6 +2016,7 @@ def createHistograms(category):
                 sel[k] &= orig
             nTotSel = float(np.sum(sel[k]))
             nExp = nTotExp * nTotSel / sel[k][orig].shape[0]
+            print("nexp = %.4f*%.4f/%.4f = %.4f" % (nTotExp,nTotSel,sel[k][orig].shape[0],nExp))
             # if n == 'dataSS_DstMu' and k == 'mm':
             #     nExp *= 1e-3
             nAux = nTotExp * np.sum(weightsCentral[sel[k]]) / sel[k][orig].shape[0]
@@ -2993,7 +3019,7 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
             n = k[k.find('__')+2:-2]
             card += n+' shape' + mcProcStr*nCat + '\n'
 
-    card += 'ctrl shape' + mcProcStr*nCat + '\n'
+    #card += 'ctrl shape' + mcProcStr*nCat + '\n'
 
     # B eta uncertainty
     names = []
