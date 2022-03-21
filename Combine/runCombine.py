@@ -401,7 +401,7 @@ def loadDatasets(category, loadRD):
                                     )
 
     dataDir = '/storage/af/group/rdst_analysis/BPhysics/data/cmsRD'
-    locRD = dataDir+'/skimmed'+args.skimmedTag+'/B2DstMu_SS_220301_{}'.format(category.name)
+    locRD = dataDir+'/skimmed_allMuEta/B2DstMu_SS_220301_{}'.format(category.name)
     dSet['dataSS_DstMu'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
     dSetTkSide['dataSS_DstMu'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
 
@@ -410,7 +410,7 @@ def loadDatasets(category, loadRD):
         print 'Loading real data datasets'
 
         creation_date = '220220'
-        locRD = dataDir+'/skimmed'+args.skimmedTag+'/B2DstMu_{}_{}'.format(creation_date, category.name)
+        locRD = dataDir+'/skimmed_allMuEta/B2DstMu_{}_{}'.format(creation_date, category.name)
         dSet['data'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
         dSetTkSide['data'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
 
@@ -771,41 +771,15 @@ def createHistograms(category):
         sel = np.logical_or(x < softPtUnc[bin][0], x > softPtUnc[bin][1])
         return np.where(sel, np.ones_like(x), 1+size*softPtUnc[bin][2])
 
-    def binnnedSoftTrackMiss(x, bin, size):
-        sel = np.logical_or(x < softPtUnc[bin][0], x > softPtUnc[bin][1])
-        if size >= 0:
-            return np.where(sel, np.ones_like(x), 0)
-        else:
-            return np.where(sel, np.ones_like(x), -size*softPtUnc[bin][2])
-
     def weightsSoftTrackEff(ds, ptList, w=None, s=None, bin=None, size=None):
         if w is None or s is None:
             weight = np.ones_like(ds['mu_pt'])
             for v in ptList:
-                tmp = binnnedSoftTrackEff(ds[v], bin, size)
-                if v == 'tkPt_0':
-                    sel = ds.N_goodAddTks >= 1
-                    tmp[~sel] = 1
-                elif v == 'tkPt_1':
-                    sel = ds.N_goodAddTks >= 2
-                    tmp[~sel] = 1
-                elif v == 'tkPt_2':
-                    tmp = binnnedSoftTrackMiss(ds[v], bin, size)
-                    sel = ds.N_goodAddTks >= 3
-                    tmp[~sel] = 1
-                    tmp[ds['tkPt_2'] > 2.0] = 0
-                weight *= tmp
+                weight *= binnnedSoftTrackEff(ds[v], bin, size)
         else:
             weight = np.ones_like(ds['mu_pt'])
             for v in ptList:
-                tmp = fSoftTrackEff(ds[v], w, s)
-                if v == 'tkPt_0':
-                    sel = ds.N_goodAddTks >= 1
-                    tmp[~sel] = 1
-                elif v == 'tkPt_1':
-                    sel = ds.N_goodAddTks >= 2
-                    tmp[~sel] = 1
-                weight *= tmp
+                weight *= fSoftTrackEff(ds[v], w, s)
         return weight
 
 
@@ -1659,7 +1633,8 @@ def createHistograms(category):
             weights['muonIdSF'], _, _ = computeMuonIDSF(ds)
 
             print 'Including soft track pT corrections'
-            partList = ['K_pt', 'pi_pt', 'pis_pt']
+            # FIXME: only used for testing!
+            partList = ['K_pt', 'pi_pt', 'pis_pt', 'tkPt_0', 'tkPt_1']
             for nBin in range(len(softPtUnc)):
                 refPt = '{:.0f}'.format(np.round(np.mean(softPtUnc[nBin][:-1])*1e3))
                 wVar['softTrkEff_'+refPt+'Up'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=+1)
