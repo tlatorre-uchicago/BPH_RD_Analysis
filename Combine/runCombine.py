@@ -461,6 +461,13 @@ def loadDatasets(category, loadRD):
             dup = dSetTkSide[name].copy()
             dup = dup[dup['ctrl'] != 0]
             dup['ctrl2'] = dup['ctrl']//10
+            # Set the massHadTks and massVisTks column equal to what it would
+            # be had we missed the last track.
+            condlist = [dup['ctrl2'] == 0, dup['ctrl2'] < 10, dup['ctrl2'] < 100, dup['ctrl2'] >= 100]
+            choicelist = [dup['massHadTks1'], dup['massHadTks1'], dup['massHadTks2'], dup['massHadTks2']]
+            dup['massHadTks'] = np.select(condlist,choicelist)
+            choicelist = [dup['massVisTks1'], dup['massVisTks1'], dup['massVisTks2'], dup['massVisTks2']]
+            dup['massVisTks'] = np.select(condlist,choicelist)
             # Make sure we didn't accidentally copy any events which don't
             # move.
             if (dup['ctrl2'] == dup['ctrl']).any():
