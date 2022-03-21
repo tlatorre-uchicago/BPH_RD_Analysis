@@ -314,45 +314,33 @@ def cleanPreviousResults():
 controlRegSel = {}
 def selfun__TkPlus(ds):
     #sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] > 0)
-    sel = ds['ctrl'] == 1
+    sel = ds['ctrl2'] == 1
     return sel
 controlRegSel['p_'] = selfun__TkPlus
 
 def selfun__TkMinus(ds):
     sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] < 0)
-    sel = ds['ctrl'] == 2
+    sel = ds['ctrl2'] == 2
     return sel
 controlRegSel['m_'] = selfun__TkMinus
 
 def selfun__TkPlusMinus(ds):
-    if any('MC' in name for name in ds.columns):
-        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl'] == 12) | (ds['ctrl'] == 21) | (ds['ctrl']//10 == 12) | (ds['ctrl']//10 == 21)
-    else:
-        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] == 2)
-        sel = (ds['ctrl'] == 12) | (ds['ctrl'] == 21)
+    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] >= 2)
+    sel = (ds['ctrl2'] == 12) | (ds['ctrl2'] == 21)
     sel = np.logical_and(ds['massVisTks'] < 5.55, sel)
     return sel
 controlRegSel['pm'] = selfun__TkPlusMinus
 
 def selfun__TkMinusMinus(ds):
-    if any('MC' in name for name in ds.columns):
-        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl'] == 22) | (ds['ctrl']//10 == 22)
-    else:
-        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
-        sel = ds['ctrl'] == 22
+    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
+    sel = ds['ctrl2'] == 22
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['mm'] = selfun__TkMinusMinus
 
 def selfun__TkPlusPlus(ds):
-    if any('MC' in name for name in ds.columns):
-        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] >= 2)
-        sel = (ds['ctrl'] == 11) | (ds['ctrl']//10 == 11)
-    else:
-        sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
-        sel = ds['ctrl'] == 11
+    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
+    sel = ds['ctrl2'] == 11
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['pp'] = selfun__TkPlusPlus
@@ -956,7 +944,7 @@ def createHistograms(category):
         if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
                 
-            #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
             # The conditions here are:
             #
             #     1. This is an original event with no extra tracks.
@@ -964,12 +952,12 @@ def createHistograms(category):
             #     3. This is an original event which didn't get moved.
             #     4. This is a duplicate event which got moved.
             #     5. This is a duplicate event which didn't get moved.
-            #condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
-            #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-            #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
-            #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-            #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-            #wVar['ctrlUp'] = np.select(condlist,[1,0,1,1,0])
+            condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
+                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
+                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1576,7 +1564,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
-            #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
             # The conditions here are:
             #
             #     1. This is an original event with no extra tracks.
@@ -1584,12 +1572,12 @@ def createHistograms(category):
             #     3. This is an original event which didn't get moved.
             #     4. This is a duplicate event which got moved.
             #     5. This is a duplicate event which didn't get moved.
-            #condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
-            #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-            #            (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
-            #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-            #            (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-            #wVar['ctrlUp'] = np.select(condlist,[1,0,1,1,0])
+            condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
+                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
+                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
