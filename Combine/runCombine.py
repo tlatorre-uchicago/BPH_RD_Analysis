@@ -396,7 +396,7 @@ def loadDatasets(category, loadRD):
                                     )
 
     dataDir = '/storage/af/group/rdst_analysis/BPhysics/data/cmsRD'
-    locRD = dataDir+'/skimmed_allMuEta/B2DstMu_SS_220301_{}'.format(category.name)
+    locRD = dataDir+'/skimmed'+args.skimmedTag+'/B2DstMu_SS_220301_{}'.format(category.name)
     dSet['dataSS_DstMu'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
     dSetTkSide['dataSS_DstMu'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
 
@@ -405,7 +405,7 @@ def loadDatasets(category, loadRD):
         print 'Loading real data datasets'
 
         creation_date = '220220'
-        locRD = dataDir+'/skimmed_allMuEta/B2DstMu_{}_{}'.format(creation_date, category.name)
+        locRD = dataDir+'/skimmed'+args.skimmedTag+'/B2DstMu_{}_{}'.format(creation_date, category.name)
         dSet['data'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
         dSetTkSide['data'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
 
