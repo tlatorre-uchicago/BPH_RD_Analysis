@@ -1986,7 +1986,7 @@ def createHistograms(category):
                 selFun = controlRegSel['mm']
             sel[k] = selFun(ds)
             if 'data' not in n:
-                orig = ds[sel[k]]['ctrl'] == ds[sel[k]]['ctrl2']
+                orig = ds['ctrl'] == ds['ctrl2']
                 sel[k] &= orig
             nTotSel = float(np.sum(sel[k]))
             nExp = nTotExp * nTotSel / sel[k].shape[0]
