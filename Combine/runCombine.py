@@ -1985,14 +1985,14 @@ def createHistograms(category):
             elif n == 'dataSS_DstMu' and k == 'pm':
                 selFun = controlRegSel['mm']
             sel[k] = selFun(ds)
+            orig = ds['ctrl'] == ds['ctrl2']
             if 'data' not in n:
-                orig = ds['ctrl'] == ds['ctrl2']
                 sel[k] &= orig
             nTotSel = float(np.sum(sel[k]))
-            nExp = nTotExp * nTotSel / sel[k].shape[0]
+            nExp = nTotExp * nTotSel / sel[k][orig].shape[0]
             # if n == 'dataSS_DstMu' and k == 'mm':
             #     nExp *= 1e-3
-            nAux = nTotExp * np.sum(weightsCentral[sel[k]]) / sel[k].shape[0]
+            nAux = nTotExp * np.sum(weightsCentral[sel[k]]) / sel[k][orig].shape[0]
             table.add_row([k] + '{:.0f} {:.0f} {:.0f}'.format(nTotSel, nExp, nAux).split(' '))
             latexTableString[k] = '{:.0f} ({:.0f})'.format(nAux, nTotSel)
             if not k in totalCounting.keys():
