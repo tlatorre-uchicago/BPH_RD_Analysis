@@ -972,7 +972,8 @@ def createHistograms(category):
         else:
             sMC = MCsample[n]
 
-            nTotSelected = ds['q2'].shape[0]
+            orig = ds['ctrl'] == ds['ctrl2']
+            nTotSelected = ds[orig]['q2'].shape[0]
             print 'N tot selected: {:.1f}k'.format(1e-3*nTotSelected)
             totalCounting[1] += 1e-3*nTotSelected
             nGenExp = sMC.effMCgen['xsec'][0] * expectedLumi[category.name] * data_over_MC_overallNorm
