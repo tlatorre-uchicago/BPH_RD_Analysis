@@ -434,9 +434,9 @@ def loadDatasets(category, loadRD):
     # This allows us to compute what would happen if events moved between the
     # control groups.
     def get_ctrl_group(ds):
-        tk0 = np.where(ds['tkCharge_0'] == -1, 2, ds['tkCharge_0'])
-        tk1 = np.where(ds['tkCharge_1'] == -1, 2, ds['tkCharge_1'])
-        tk2 = np.where(ds['tkCharge_2'] == -1, 2, ds['tkCharge_2'])
+        tk0 = np.where(ds['tkCharge_0'] == -1, 2, ds['tkCharge_0']).astype(int)
+        tk1 = np.where(ds['tkCharge_1'] == -1, 2, ds['tkCharge_1']).astype(int)
+        tk2 = np.where(ds['tkCharge_2'] == -1, 2, ds['tkCharge_2']).astype(int)
         condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
         choicelist = np.array([np.zeros_like(tk0),tk0,tk0*10+tk1,tk0*100+tk1*10+tk2,tk0*100+tk1*10+tk2])
         return np.select(condlist,choicelist)
