@@ -410,7 +410,6 @@ def loadDatasets(category, loadRD):
         dSet['data'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
         dSetTkSide['data'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
 
-<<<<<<< HEAD
     # Add a column specifying the control region. Here, the control region
     # number is sort of like the control region expressed as an integer. It is
     # a three digit number where the number in the least significant digit
