@@ -1019,7 +1019,6 @@ def createHistograms(category):
             for nBin in range(len(softPtUnc)):
                 refPt = '{:.0f}'.format(np.round(np.mean(softPtUnc[nBin][:-1])*1e3))
                 wVar['softTrkEff_'+refPt+'Up'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=+1)
-                weights['softTrkEff_'+refPt] = weightsSoftTrackEff(ds, partList, bin=nBin, size=0)
                 wVar['softTrkEff_'+refPt+'Down'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=-1)
 
 
@@ -1630,7 +1629,6 @@ def createHistograms(category):
             for nBin in range(len(softPtUnc)):
                 refPt = '{:.0f}'.format(np.round(np.mean(softPtUnc[nBin][:-1])*1e3))
                 wVar['softTrkEff_'+refPt+'Up'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=+1)
-                weights['softTrkEff_'+refPt] = weightsSoftTrackEff(ds, partList, bin=nBin, size=0)
                 wVar['softTrkEff_'+refPt+'Down'] = weightsSoftTrackEff(ds, partList, bin=nBin, size=-1)
 
             ############################
