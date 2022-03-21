@@ -458,20 +458,20 @@ def loadDatasets(category, loadRD):
             dup['ctrl2'] = dup['ctrl']//10
             # Set the massHadTks and massVisTks column equal to what it would
             # be had we missed the last track.
-            condlist = [dup['ctrl2'] == 0, dup['ctrl2'] < 10, dup['ctrl2'] < 100, dup['ctrl2'] >= 100]
-            choicelist = [dup['massHadTks1'], dup['massHadTks1'], dup['massHadTks2'], dup['massHadTks2']]
-            dup['massHadTks'] = np.select(condlist,choicelist)
-            choicelist = [dup['massVisTks1'], dup['massVisTks1'], dup['massVisTks2'], dup['massVisTks2']]
-            dup['massVisTks'] = np.select(condlist,choicelist)
+            #condlist = [dup['ctrl2'] == 0, dup['ctrl2'] < 10, dup['ctrl2'] < 100, dup['ctrl2'] >= 100]
+            #choicelist = [dup['massHadTks1'], dup['massHadTks1'], dup['massHadTks2'], dup['massHadTks2']]
+            #dup['massHadTks'] = np.select(condlist,choicelist)
+            #choicelist = [dup['massVisTks1'], dup['massVisTks1'], dup['massVisTks2'], dup['massVisTks2']]
+            #dup['massVisTks'] = np.select(condlist,choicelist)
             # Make sure we didn't accidentally copy any events which don't
             # move.
             if (dup['ctrl2'] == dup['ctrl']).any():
                 raise Exception("ctrl2 == ctrl!")
             # Now put events in the correct dictionary since we have separate
             # dictionaries for the signal and track control regions
-            dSetTkSide[name] = pd.concat((dSetTkSide[name],dup[dup['ctrl2'] != 0]))
+            dSetTkSide[name] = pd.concat((dSetTkSide[name],dup[dup['ctrl2'] != 0]),ignore_index=True)
             if name in dSet:
-                dSet[name] = pd.concat((dSet[name],dup[dup['ctrl2'] == 0]))
+                dSet[name] = pd.concat((dSet[name],dup[dup['ctrl2'] == 0]),ignore_index=True)
 
     if args.dumpWeightsTree:
         print 'Skipping on the flight cuts (if any).'
@@ -925,7 +925,7 @@ def createHistograms(category):
         if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
 
-            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
             # The conditions here are:
             #
             #     1. This is an original event with no extra tracks.
@@ -938,7 +938,7 @@ def createHistograms(category):
                         (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
                         (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
                         (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
+            #wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1545,7 +1545,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
-            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            #wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
             # The conditions here are:
             #
             #     1. This is an original event with no extra tracks.
@@ -1558,7 +1558,7 @@ def createHistograms(category):
                         (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
                         (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
                         (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
+            #wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
@@ -2977,7 +2977,7 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
             n = k[k.find('__')+2:-2]
             card += n+' shape' + mcProcStr*nCat + '\n'
 
-    card += 'ctrl shape' + mcProcStr*nCat + '\n'
+    #card += 'ctrl shape' + mcProcStr*nCat + '\n'
 
     # B eta uncertainty
     names = []
