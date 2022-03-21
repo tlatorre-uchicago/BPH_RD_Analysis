@@ -1966,7 +1966,8 @@ def createHistograms(category):
             mcType = 'bare' if args.bareMC else 'corr'
             auxName = category.name + 'trkCtrl_' + mcType + '_' + card_name + '.root'
 
-            wDf = pd.DataFrame.from_dict({'central': weightsCentral*nTotExp/float(weightsCentral.shape[0]) })
+            orig = ds['ctrl'] == ds['ctrl2']
+            wDf = pd.DataFrame.from_dict({'central': weightsCentral*nTotExp/float(weightsCentral[orig].shape[0]) })
             for k, w in wVar.iteritems():
                 if k:
                     wDf[k] = w*wDf['central']
