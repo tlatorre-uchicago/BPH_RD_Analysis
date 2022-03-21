@@ -1659,10 +1659,16 @@ def createHistograms(category):
             cname = 'addTk_pt_cali_'+category.name
             w, auxVarDic = computeKinCalWeights(ds, 'tkPt_0', cname, cal_addTK_pt)
             # Apply it only if they are not from main B
-            sel = ds['MC_tkFromMainB_0'] < 0.5
-            print 'Affecting {:.1f}% of additional tracks'.format(100*np.sum(ds['MC_tkFromMainB_0'] < 0.5)/float(ds.shape[0]))
+            orig = ds['ctrl'] == ds['ctrl2']
+            sel = (ds['MC_tkFromMainB_0'] < 0.5) & orig
+            print 'Affecting {:.1f}% of additional tracks'.format(100*np.sum(sel)/float(ds[orig].shape[0]))
             weights[cname] = np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
-            print 'Normalization change: {:.3f}'.format(np.sum(weights[cname])/ float(weights[cname].shape[0]))
+            print 'Normalization change: {:.3f}'.format(np.sum(weights[cname][orig])/ float(weights[cname][orig].shape[0]))
+            for k in auxVarDic.keys():
+                wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
+            # Now, apply the same correction to duplicate tracks
+            sel = (ds['MC_tkFromMainB_0'] < 0.5) & ~orig
+            weights[cname] = np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
             for k in auxVarDic.keys():
                 wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
 
