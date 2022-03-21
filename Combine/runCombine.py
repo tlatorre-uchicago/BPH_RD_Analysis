@@ -313,29 +313,29 @@ def cleanPreviousResults():
 ########################### -------- Create histrograms ------------------ #########################
 controlRegSel = {}
 def selfun__TkPlus(ds):
-    sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] > 0)
+    sel = ds['ctrl2'] == 1
     return sel
 controlRegSel['p_'] = selfun__TkPlus
 
 def selfun__TkMinus(ds):
-    sel = np.logical_and(ds['N_goodAddTks'] == 1, ds['tkCharge_0'] < 0)
+    sel = ds['ctrl2'] == 2
     return sel
 controlRegSel['m_'] = selfun__TkMinus
 
 def selfun__TkPlusMinus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == 0, ds['N_goodAddTks'] == 2)
+    sel = (ds['ctrl2'] == 12) | (ds['ctrl2'] == 21)
     sel = np.logical_and(ds['massVisTks'] < 5.55, sel)
     return sel
 controlRegSel['pm'] = selfun__TkPlusMinus
 
 def selfun__TkMinusMinus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == -2, ds['N_goodAddTks'] == 2)
+    sel = ds['ctrl2'] == 22
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['mm'] = selfun__TkMinusMinus
 
 def selfun__TkPlusPlus(ds):
-    sel = np.logical_and(ds['tkCharge_0']+ds['tkCharge_1'] == +2, ds['N_goodAddTks'] == 2)
+    sel = ds['ctrl2'] == 11
     sel = np.logical_and(ds['massVisTks'] < 5.3, sel)
     return sel
 controlRegSel['pp'] = selfun__TkPlusPlus
@@ -409,6 +409,70 @@ def loadDatasets(category, loadRD):
         locRD = dataDir+'/skimmed'+args.skimmedTag+'/B2DstMu_{}_{}'.format(creation_date, category.name)
         dSet['data'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
         dSetTkSide['data'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
+
+    # Add a column specifying the control region. Here, the control region
+    # number is sort of like the control region expressed as an integer. It is
+    # a three digit number where the number in the least significant digit
+    # represents the charge of the first track (1 for positive, 2 for
+    # negative), the next digit represents the charge of the second track, etc.
+    #
+    # For example, ctrl == 0 represents the signal region, ctrl == 200
+    # represents the minus control region, etc.
+    #
+    # The nice thing about this representation is that if you want to find out
+    # what would happen if you didn't reconstruct the lowest pt track, you can
+    # just compute ctrl//10. For example:
+    #
+    #     >>> ctrl = 222
+    #     >>> ctrl//10
+    #     22
+    #
+    # This allows us to compute what would happen if events moved between the
+    # control groups.
+    def get_ctrl_group(ds):
+        tk0 = np.where(ds['tkCharge_0'] == -1, 2, ds['tkCharge_0']).astype(int)
+        tk1 = np.where(ds['tkCharge_1'] == -1, 2, ds['tkCharge_1']).astype(int)
+        tk2 = np.where(ds['tkCharge_2'] == -1, 2, ds['tkCharge_2']).astype(int)
+        condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
+        choicelist = np.array([np.zeros_like(tk0),tk0,tk0*10+tk1,tk0*100+tk1*10+tk2,tk0*100+tk1*10+tk2])
+        return np.select(condlist,choicelist)
+
+    def get_min_pt(ds):
+        condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
+        choicelist = np.array([np.zeros_like(ds['tkPt_0']),ds['tkPt_0'],ds['tkPt_1'],ds['tkPt_2'],ds['tkPt_2']])
+        return np.select(condlist,choicelist)
+
+    for name in dSet:
+        dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
+        dSet[name]['ctrl2'] = dSet[name]['ctrl']
+        dSet[name]['tkPt_last'] = get_min_pt(dSet[name])
+
+    for name in dSetTkSide:
+        dSetTkSide[name]['ctrl'] = get_ctrl_group(dSetTkSide[name])
+        dSetTkSide[name]['ctrl2'] = dSetTkSide[name]['ctrl']
+        dSetTkSide[name]['tkPt_last'] = get_min_pt(dSetTkSide[name])
+        if 'data' not in name:
+            # Here is where we duplicate the MC to allow us to move events
+            # between control regions.
+            dup = dSetTkSide[name].copy()
+            dup = dup[dup['ctrl'] != 0]
+            dup['ctrl2'] = dup['ctrl']//10
+            # Set the massHadTks and massVisTks column equal to what it would
+            # be had we missed the last track.
+            condlist = [dup['ctrl2'] == 0, dup['ctrl2'] < 10, dup['ctrl2'] < 100, dup['ctrl2'] >= 100]
+            choicelist = [dup['massHadTks1'], dup['massHadTks1'], dup['massHadTks2'], dup['massHadTks2']]
+            dup['massHadTks'] = np.select(condlist,choicelist)
+            choicelist = [dup['massVisTks1'], dup['massVisTks1'], dup['massVisTks2'], dup['massVisTks2']]
+            dup['massVisTks'] = np.select(condlist,choicelist)
+            # Make sure we didn't accidentally copy any events which don't
+            # move.
+            if (dup['ctrl2'] == dup['ctrl']).any():
+                raise Exception("ctrl2 == ctrl!")
+            # Now put events in the correct dictionary since we have separate
+            # dictionaries for the signal and track control regions
+            dSetTkSide[name] = pd.concat((dSetTkSide[name],dup[dup['ctrl2'] != 0]),ignore_index=True)
+            if name in dSet:
+                dSet[name] = pd.concat((dSet[name],dup[dup['ctrl2'] == 0]),ignore_index=True)
 
     if args.useMVA:
         fname = '/storage/af/group/rdst_analysis/BPhysics/data/kinObsMVA/clfGBC_tauVall_{}{}.p'.format(args.useMVA, category.name)
@@ -484,8 +548,12 @@ def loadDatasets(category, loadRD):
                         raise
                     sel = np.logical_and(sel, np.logical_and(dSet[k][var] > low, dSet[k][var] < high))
 
+                orig = dSet[k]['ctrl'] == dSet[k]['ctrl2']
                 dSet[k] = dSet[k][sel]
-                corrScaleFactors[k] = np.sum(sel)/float(sel.shape[0])
+                # We don't want to include the duplicate events here, so we
+                # compute the correction scale factors only for those events
+                # which aren't duplicates.
+                corrScaleFactors[k] = np.sum(sel[orig])/float(sel[orig].shape[0])
 
                 sel = np.ones_like(dSetTkSide[k]['q2']).astype(np.bool)
                 for var, low, high in addCuts:
@@ -508,8 +576,12 @@ def loadDatasets(category, loadRD):
                         auxSel = np.logical_or( np.logical_not(controlRegSel[region](dSetTkSide[k])), thisSel)
                         sel = np.logical_and(sel, auxSel)
 
+                orig = dSetTkSide[k]['ctrl'] == dSetTkSide[k]['ctrl2']
                 dSetTkSide[k] = dSetTkSide[k][sel]
-                corrScaleFactors[k+'_tk'] = np.sum(sel)/float(sel.shape[0])
+                # We don't want to include the duplicate events here, so we
+                # compute the correction scale factors only for those events
+                # which aren't duplicates.
+                corrScaleFactors[k+'_tk'] = np.sum(sel[orig])/float(sel[orig].shape[0])
 
 
     return MCsample, dSet, dSetTkSide
@@ -726,12 +798,12 @@ def createHistograms(category):
 
     def weightsSoftTrackEff(ds, ptList, w=None, s=None, bin=None, size=None):
         if w is None or s is None:
-            weight = binnnedSoftTrackEff(ds[ptList[0]], bin, size)
-            for v in ptList[1:]:
+            weight = np.ones_like(ds['mu_pt'])
+            for v in ptList:
                 weight *= binnnedSoftTrackEff(ds[v], bin, size)
         else:
-            weight = fSoftTrackEff(ds[ptList[0]], w, s)
-            for v in ptList[1:]:
+            weight = np.ones_like(ds['mu_pt'])
+            for v in ptList:
                 weight *= fSoftTrackEff(ds[v], w, s)
         return weight
 
@@ -867,13 +939,31 @@ def createHistograms(category):
         print '\n----------->', n, '<-------------'
         wVar = {}
         weights = {}
+        if 'data' not in n:
+            weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
+
+            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            # The conditions here are:
+            #
+            #     1. This is an original event with no extra tracks.
+            #     2. This is an original event which got moved.
+            #     3. This is an original event which didn't get moved.
+            #     4. This is a duplicate event which got moved.
+            #     5. This is a duplicate event which didn't get moved.
+            condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
+                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
+                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
         else:
             sMC = MCsample[n]
 
-            nTotSelected = ds['q2'].shape[0]
+            orig = ds['ctrl'] == ds['ctrl2']
+            nTotSelected = ds[orig]['q2'].shape[0]
             print 'N tot selected: {:.1f}k'.format(1e-3*nTotSelected)
             totalCounting[1] += 1e-3*nTotSelected
             nGenExp = sMC.effMCgen['xsec'][0] * expectedLumi[category.name] * data_over_MC_overallNorm
@@ -1462,6 +1552,22 @@ def createHistograms(category):
         print '\n----------->', n, '<-------------'
         wVar = {}
         weights = {}
+        if 'data' not in n:
+            weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
+            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
+            # The conditions here are:
+            #
+            #     1. This is an original event with no extra tracks.
+            #     2. This is an original event which got moved.
+            #     3. This is an original event which didn't get moved.
+            #     4. This is a duplicate event which got moved.
+            #     5. This is a duplicate event which didn't get moved.
+            condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
+                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
+                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
+                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
+            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
@@ -1527,6 +1633,7 @@ def createHistograms(category):
             weights['muonIdSF'], _, _ = computeMuonIDSF(ds)
 
             print 'Including soft track pT corrections'
+            # FIXME: only used for testing!
             partList = ['K_pt', 'pi_pt', 'pis_pt', 'tkPt_0', 'tkPt_1']
             for nBin in range(len(softPtUnc)):
                 refPt = '{:.0f}'.format(np.round(np.mean(softPtUnc[nBin][:-1])*1e3))
@@ -1561,10 +1668,16 @@ def createHistograms(category):
             cname = 'addTk_pt_cali_'+category.name
             w, auxVarDic = computeKinCalWeights(ds, 'tkPt_0', cname, cal_addTK_pt)
             # Apply it only if they are not from main B
-            sel = ds['MC_tkFromMainB_0'] < 0.5
-            print 'Affecting {:.1f}% of additional tracks'.format(100*np.sum(ds['MC_tkFromMainB_0'] < 0.5)/float(ds.shape[0]))
+            orig = ds['ctrl'] == ds['ctrl2']
+            sel = (ds['MC_tkFromMainB_0'] < 0.5) & orig
+            print 'Affecting {:.1f}% of additional tracks'.format(100*np.sum(sel)/float(ds[orig].shape[0]))
             weights[cname] = np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
-            print 'Normalization change: {:.3f}'.format(np.sum(weights[cname])/ float(weights[cname].shape[0]))
+            print 'Normalization change: {:.3f}'.format(np.sum(weights[cname][orig])/ float(weights[cname][orig].shape[0]))
+            for k in auxVarDic.keys():
+                wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
+            # Now, apply the same correction to duplicate tracks
+            sel = (ds['MC_tkFromMainB_0'] < 0.5) & ~orig
+            weights[cname] = np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
             for k in auxVarDic.keys():
                 wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
 
@@ -2876,6 +2989,8 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
         if k.startswith(processOrder[0]+'__softTrkEff') and k.endswith('Up'):
             n = k[k.find('__')+2:-2]
             card += n+' shape' + mcProcStr*nCat + '\n'
+
+    card += 'ctrl shape' + mcProcStr*nCat + '\n'
 
     # B eta uncertainty
     names = []
