@@ -517,7 +517,11 @@ def loadDatasets(category, loadRD):
                     sel = np.logical_and(sel, np.logical_and(dSet[k][var] > low, dSet[k][var] < high))
 
                 dSet[k] = dSet[k][sel]
-                corrScaleFactors[k] = np.sum(sel)/float(sel.shape[0])
+                # We don't want to include the duplicate events here, so we
+                # compute the correction scale factors only for those events
+                # which aren't duplicates.
+                orig = dSet[k]['ctrl'] == dSet[k]['ctrl2']
+                corrScaleFactors[k] = np.sum(sel[orig])/float(sel[orig].shape[0])
 
                 sel = np.ones_like(dSetTkSide[k]['q2']).astype(np.bool)
                 for var, low, high in addCuts:
@@ -541,7 +545,11 @@ def loadDatasets(category, loadRD):
                         sel = np.logical_and(sel, auxSel)
 
                 dSetTkSide[k] = dSetTkSide[k][sel]
-                corrScaleFactors[k+'_tk'] = np.sum(sel)/float(sel.shape[0])
+                # We don't want to include the duplicate events here, so we
+                # compute the correction scale factors only for those events
+                # which aren't duplicates.
+                orig = dSetTkSide[k]['ctrl'] == dSetTkSide[k]['ctrl2']
+                corrScaleFactors[k+'_tk'] = np.sum(sel[orig])/float(sel[orig].shape[0])
 
 
     return MCsample, dSet, dSetTkSide
