@@ -1676,9 +1676,9 @@ def createHistograms(category):
                 wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
             # Now, apply the same correction to duplicate tracks
             sel = (ds['MC_tkFromMainB_0'] < 0.5) & ~orig
-            weights[cname] = np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
+            weights[cname] *= np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
             for k in auxVarDic.keys():
-                wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
+                wVar[k] *= np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
 
         ############################
         # Form factor correction
