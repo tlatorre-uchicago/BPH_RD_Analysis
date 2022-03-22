@@ -3097,6 +3097,13 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
                 'brDstPiPi_D2S_D2stPi',
                 'brDstPiPi_D1Pi', 'brDstPiPi_D1stPi', 'brDstPiPi_D2stPi']:
         card += nnn + ' shape'  + aux*nCat + '\n'
+
+    aux = ''
+    for p in processes:
+        if re.match('B[usd]_DstD[usd]', n):
+            aux += ' 1.'
+        else:
+            aux += ' -'
     for nnn, proc_id, centralVal, relScale in DST_HC_PROCESSES:
         card += nnn + ' shape'  + aux*nCat + '\n'
     # card += 'Dst2S_width shape' + aux*nCat + '\n'
