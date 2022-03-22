@@ -48,19 +48,19 @@ CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
 DST_HC_PROCESSES = [\
-    ('procid101',101,1,0.5),
-    ('procid102',102,1,0.5),
-    ('procid103',103,1,0.5),
-    ('procid104',104,1,0.5),
-    ('procid105',105,1,0.5), # 1.5, 1.8
-    ('procid106',106,1,0.5), # 1.6, 1.9
-    ('procid107',107,1,0.5), # 1.7, 1.10
-    ('procid201',201,1,0.5), # 2.1, 2.2
-    ('procid203',203,1,0.5), # 2.3, 2.4
-    ('procid205',205,1,0.5), # 2.5, 2.8
-    ('procid206',206,1,0.5), # 2.6, 2.9
-    ('procid207',207,1,0.5), # 2.7, 2.10
-    ('procid211',211,1,0.5), # 2.11, 2.12
+    ('procid101',101,1,0.21/2.47), # 1.1
+    ('procid102',102,4,0.5),       # 1.2 (central val should be 1?)
+    ('procid103',103,1,0.9/10.6),  # 1.3
+    ('procid104',104,4,0.5),       # 1.4 (central val should be 1?)
+    ('procid105',105,1,0.47/5.43), # 1.5, 1.8
+    ('procid106',106,4,0.5),       # 1.6, 1.9 (central val should be 1?)
+    ('procid107',107,1,0.5),       # 1.7, 1.10
+    ('procid201',201,1,0.5),       # 2.1, 2.2
+    ('procid203',203,1,0.5),       # 2.3, 2.4
+    ('procid205',205,1,0.5),       # 2.5, 2.8
+    ('procid206',206,1,0.5),       # 2.6, 2.9
+    ('procid207',207,1,0.5),       # 2.7, 2.10
+    ('procid211',211,1,0.5),       # 2.11, 2.12
     ('procid301',301,1,0.5),
     ('procid302',302,1,0.5),
     ('procid303',303,1,0.5),
@@ -3097,7 +3097,7 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
                 'brDstPiPi_D2S_D2stPi',
                 'brDstPiPi_D1Pi', 'brDstPiPi_D1stPi', 'brDstPiPi_D2stPi']:
         card += nnn + ' shape'  + aux*nCat + '\n'
-    for nnn in DST_HC_PROCESSES:
+    for nnn, proc_id, centralVal, relScale in DST_HC_PROCESSES:
         card += nnn + ' shape'  + aux*nCat + '\n'
     # card += 'Dst2S_width shape' + aux*nCat + '\n'
     # card += 'brDstst_DststPi shape' + aux*nCat + '\n'
