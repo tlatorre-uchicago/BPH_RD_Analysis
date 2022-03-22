@@ -47,6 +47,67 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
+# List of all known B -> D*Hc decays. You can find more information about each
+# of them at https://www.overleaf.com/read/ykppfynnfxdt, and how exactly they
+# are defined in B2DstMu_skimCAND_v1.py.
+#
+# The tuple has the following values:
+#     1. Parameter Name
+#     2. procId_DstHc (set in B2DstMu_skimCAND_v1.py)
+#     3. Central value (relative to Monte Carlo)
+#     4. Relative uncertainty
+DST_HC_PROCESSES = [\
+    ('procid101',101,1,0.21/2.47), # 1.1
+    ('procid102',102,4,0.5),       # 1.2 (not measured? x4)
+    ('procid103',103,1,0.9/10.6),  # 1.3
+    ('procid104',104,4,0.5),       # 1.4 (not measured? x4)
+    ('procid105',105,1,0.47/5.43), # 1.5, 1.8
+    ('procid106',106,4,0.5),       # 1.6, 1.9 (not measured? x4)
+    ('procid107',107,1,0.04/0.54), # 1.7, 1.10
+    ('procid201',201,1,0.25/3.2),  # 2.1, 2.2
+    ('procid203',203,1,0.5),       # 2.3, 2.4 (not measured?)
+    ('procid205',205,1,0.23/2.67), # 2.5, 2.8
+    ('procid206',206,1,0.5),       # 2.6, 2.9 (not measured?)
+    ('procid207',207,1,0.02/0.26), # 2.7, 2.10
+    ('procid211',211,1,0.15/0.61), # 2.11, 2.12
+    ('procid301',301,1,1.1/8),     # 3.1
+    #('procid302',302,1,0.14/17.7), # 3.2
+    ('procid302',302,4,0.5),       # 3.2 (x4)
+    ('procid303',303,1,0.6/1.5),   # 3.3
+    ('procid401',401,1,0.4/3.8),   # 4.1
+    ('procid402',402,1,0.5),       # 4.2 (not measured?)
+    ('procid403',403,1,1.2/9.2),   # 4.3
+    ('procid404',404,1,0.5),       # 4.4 (not measured?)
+    ('procid405',405,1,0.12/0.88), # 4.5, 4.7
+    ('procid406',406,1,0.5),       # 4.6, 4.8 (not measured?)
+    ('procid409',409,1,0.05/0.39), # 4.9
+    ('procid410',410,1,0.17/0.81), # 4.10
+    ('procid450',450,1,0.5),       # (?)
+    ('procid501',501,1,0.12/0.6),  # 5.1, 5.3
+    ('procid502',502,1,0.5),       # 5.2, 5.4 (not measured?)
+    ('procid505',505,1,0.06/0.44), # 5.5, 5.7
+    ('procid506',506,1,0.5),       # 5.6, 5.8 (not measured?)
+    ('procid520',520,1,0.5),       # (?)
+    ('procid601',601,1,0.5),       # Not measured
+    ('procid602',602,1,0.5),       # Not measured
+    ('procid603',603,1,0.5),       # Not measured
+    ('procid604',604,1,0.5),       # Not measured
+    ('procid605',605,1,0.5),       # Not measured
+    ('procid606',606,1,0.5),       # (?)
+    ('procid620',620,1,0.5),       # (?)
+    ('procid621',621,1,0.5),       # (?)
+    ('procid701',701,1,0.5),       # (?)
+    ('procid702',702,1,0.5),       # (?)
+    ('procid_1',-1,0.1,0.5),       # No MC decay matching
+    ('procid_2',-2,0.1,0.5),       # B -> D* mu nu (slipped in)
+    ('procid_3',-3,0.1,0.5),       # B -> D* tau nu (slipped in)
+    ('procid_4',-4,0.1,0.5),       # B -> D** mu nu (slipped in)
+    ('procid_5',-5,0.1,0.5),       # Bs -> Ds** mu nu (slipped in)
+    ('procid_6',-6,0.1,0.5),       # D** tau nu splipped in
+    ('procid_100',-100,1,0.5),     # 4 or more bodies decay
+    ('procid_101',-101,1,0.5),     # D* from D**
+]
+
 import argparse
 parser = argparse.ArgumentParser(description='Script used to run combine on the R(D*) analysis.',
                                  epilog='Test example: ./runCombine.py -c low',
@@ -1134,106 +1195,10 @@ def createHistograms(category):
         ############################
         # From https://www.overleaf.com/read/ykppfynnfxdt
         inflateRate = 2.5
-        if n == 'Bd_DstDu': #1
-            print 'Including Bd->D*Du br variations'
-            # 1.1
-            _, wVar['brBd_DstDuKUp'], wVar['brBd_DstDuKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421,
-                                                                                         'MC_StrangeDstSisPdgId': 321},
-                                                                                    inflateRate*0.21/2.47)
-            # 1.3, 1.5-8
-            _, x1_3u, x1_3d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 321}, inflateRate*0.9/10.6)
-            _, x1_5u, x1_5d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 311}, inflateRate*0.47/5.4)
-            wVar['brBd_DstDustKUp'] = x1_3u * x1_5u
-            wVar['brBd_DstDustKDown'] = x1_3d * x1_5d
-
-            # 1.7-10
-            _, wVar['brBd_DstDustUp'], wVar['brBd_DstDustDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413,
-                                                                                           'MC_StrangeDstSisPdgId': 0},
-                                                                                      inflateRate*0.4/5.4)
-
-            # Correlate all K* decays (1.2, 1.4, 1.6-9)
-            x1_2, x1_2u, x1_2d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.)
-            x1_4, x1_4u, x1_4d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.)
-            x1_6, x1_6u, x1_6d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            weights['brBd_DstDuKst'] = x1_2 * x1_4 * x1_6
-            wVar['brBd_DstDuKstUp'] = x1_2u * x1_4u * x1_6u
-            wVar['brBd_DstDuKstDown'] = x1_2d * x1_4d * x1_6d
-        if n == 'Bd_DstDd': #2
-            # 2.1-2
-            _, wVar['brBd_DstDdKUp'], wVar['brBd_DstDdKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411,
-                                                                                         'MC_StrangeDstSisPdgId': 311},
-                                                                                    inflateRate*0.25/3.2)
-            # 2.5-8
-            _, wVar['brBd_DstDdstKUp'], wVar['brBd_DstDdstKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413,
-                                                                                             'MC_StrangeDstSisPdgId': 311},
-                                                                                        inflateRate*0.23/2.7)
-            # 2.7-10
-            _, wVar['brBd_DstDdstUp'], wVar['brBd_DstDdstDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413,
-                                                                                           'MC_StrangeDstSisPdgId': 0},
-                                                                                      inflateRate*0.2/2.6)
-            # 2.11, 2.12
-            _, wVar['brBd_DstDdUp'], wVar['brBd_DstDdDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411,
-                                                                                       'MC_StrangeDstSisPdgId': 0},
-                                                                                  inflateRate*1.5/6.1)
-            # Correlate all K* decays (2.3-4, 2.6-9)
-            x2_3, x2_3u, x2_3d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            x2_6, x2_6u, x2_6d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            weights['brBd_DstDdKst'] = x2_3 * x2_6
-            wVar['brBd_DstDdKstUp'] = x2_3u * x2_6u
-            wVar['brBd_DstDdKstDown'] = x2_3u * x2_6u
-        if n == 'Bd_DstDs': #3
-            print 'Including Bd->D*Ds br variations'
-            # 3.1
-            _, wVar['brBd_DstDsUp'], wVar['brBd_DstDsDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 431}, inflateRate*1.1/8.0)
-            # 3.2
-            weights['brBd_DstDsst'], wVar['brBd_DstDsst'+category.name+'Up'], wVar['brBd_DstDsst'+category.name+'Down'] = computeBrVarWeights(ds, {'procId_DstHc': 302}, 0.5, centralVal=4.)
-            # 3.3
-            weights['brBd_DstDsst0'], wVar['brBd_DstDsst0Up'], wVar['brBd_DstDsst0Down'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 10431}, inflateRate*0.6/1.5, centralVal=1.)
-        if n == 'Bu_DstDu': #4
-            # 4.1
-            _, wVar['brBu_DstDuKUp'], wVar['brBu_DstDuKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421,
-                                                                                         'MC_StrangeDstSisPdgId': 311},
-                                                                                    inflateRate*0.4/3.8)
-            # 4.3, 4.5-7
-            _, x4_3u, x4_3d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 311}, inflateRate*1.2/9.2)
-            _, x4_5u, x4_5d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 321}, inflateRate*1.2/8.8)
-            wVar['brBu_DstDustKUp'] = x4_3u * x4_5u
-            wVar['brBu_DstDustKDown'] = x4_3d * x4_5d
-
-            # Correlate all K* decays (4.2, 4.4, 4.6-8)
-            x4_2, x4_2u, x4_2d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            x4_4, x4_4u, x4_4d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            x4_6, x4_6u, x4_6d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.)
-            weights['brBu_DstDuKst'] = x4_2 * x4_4 * x4_6
-            wVar['brBu_DstDuKstUp'] = x4_2u * x4_4u * x4_6u
-            wVar['brBu_DstDuKstDown'] = x4_2d * x4_4d * x4_6d
-
-            # 4.9, 4.10
-            _, x4_9u, x4_9d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421, 'MC_StrangeDstSisPdgId': 0}, inflateRate*0.5/3.9)
-            _, x4_10u, x4_10d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 0}, inflateRate*1.7/8.1)
-            wVar['brBu_DstDuUp'] = x4_9u * x4_10u
-            wVar['brBu_DstDuDown'] = x4_9d * x4_10d
-        if n == 'Bu_DstDd': #5
-            print 'Including Bu->D*Dd br variations'
-            # 5.1-3
-            _, wVar['brBu_DstDdKUp'], wVar['brBu_DstDdKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411,
-                                                                                         'MC_StrangeDstSisPdgId': 321},
-                                                                                    inflateRate*1.2/6.0)
-            # 5.5-7
-            _, wVar['brBu_DstDdstKUp'], wVar['brBu_DstDdstKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413,
-                                                                                             'MC_StrangeDstSisPdgId': 321},
-                                                                                        inflateRate*0.6/4.4)
-            # Correlate all K* decays (5.2-4, 5.6-8)
-            x5_2, x5_2u, x5_2d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.0)
-            x5_6, x5_6u, x5_6d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.0)
-            weights['brBu_DstDdKst'] = x5_2 * x5_6
-            wVar['brBu_DstDdKstUp'] = x5_2u * x5_6u
-            wVar['brBu_DstDdKstDown'] = x5_2d * x5_6d
-        if n == 'Bs_DstDs': #6
-            x6_2_4, x6_2_4u, x6_2_4d = computeBrVarWeights(ds, {'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.0)
-            weights['brBs_DstDsKst'] = x6_2_4
-            wVar['brBs_DstDsKstUp'] = x6_2_4u
-            wVar['brBs_DstDsKstDown'] = x6_2_4d
+        if re.match('B[usd]_DstD[usd]', n):
+            for name, proc_id, centralVal, relScale in DST_HC_PROCESSES:
+                weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
+                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale, absVal=False)
 
         if n == 'B_DstDXX':
             nnn = 'Bu_DstDXX_frac'
@@ -1735,106 +1700,10 @@ def createHistograms(category):
         ############################
         # From https://www.overleaf.com/read/ykppfynnfxdt
         inflateRate = 2.5
-        if n == 'Bd_DstDu': #1
-            print 'Including Bd->D*Du br variations'
-            # 1.1
-            _, wVar['brBd_DstDuKUp'], wVar['brBd_DstDuKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421,
-                                                                                         'MC_StrangeDstSisPdgId': 321},
-                                                                                    inflateRate*0.21/2.47)
-            # 1.3, 1.5-8
-            _, x1_3u, x1_3d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 321}, inflateRate*0.9/10.6)
-            _, x1_5u, x1_5d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 311}, inflateRate*0.47/5.4)
-            wVar['brBd_DstDustKUp'] = x1_3u * x1_5u
-            wVar['brBd_DstDustKDown'] = x1_3d * x1_5d
-
-            # 1.7-10
-            _, wVar['brBd_DstDustUp'], wVar['brBd_DstDustDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413,
-                                                                                           'MC_StrangeDstSisPdgId': 0},
-                                                                                      inflateRate*0.4/5.4)
-
-            # Correlate all K* decays (1.2, 1.4, 1.6-9)
-            x1_2, x1_2u, x1_2d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.)
-            x1_4, x1_4u, x1_4d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.)
-            x1_6, x1_6u, x1_6d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            weights['brBd_DstDuKst'] = x1_2 * x1_4 * x1_6
-            wVar['brBd_DstDuKstUp'] = x1_2u * x1_4u * x1_6u
-            wVar['brBd_DstDuKstDown'] = x1_2d * x1_4d * x1_6d
-        if n == 'Bd_DstDd': #2
-            # 2.1-2
-            _, wVar['brBd_DstDdKUp'], wVar['brBd_DstDdKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411,
-                                                                                         'MC_StrangeDstSisPdgId': 311},
-                                                                                    inflateRate*0.25/3.2)
-            # 2.5-8
-            _, wVar['brBd_DstDdstKUp'], wVar['brBd_DstDdstKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413,
-                                                                                             'MC_StrangeDstSisPdgId': 311},
-                                                                                        inflateRate*0.23/2.7)
-            # 2.7-10
-            _, wVar['brBd_DstDdstUp'], wVar['brBd_DstDdstDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413,
-                                                                                           'MC_StrangeDstSisPdgId': 0},
-                                                                                      inflateRate*0.2/2.6)
-            # 2.11, 2.12
-            _, wVar['brBd_DstDdUp'], wVar['brBd_DstDdDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411,
-                                                                                       'MC_StrangeDstSisPdgId': 0},
-                                                                                  inflateRate*1.5/6.1)
-            # Correlate all K* decays (2.3-4, 2.6-9)
-            x2_3, x2_3u, x2_3d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            x2_6, x2_6u, x2_6d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            weights['brBd_DstDdKst'] = x2_3 * x2_6
-            wVar['brBd_DstDdKstUp'] = x2_3u * x2_6u
-            wVar['brBd_DstDdKstDown'] = x2_3u * x2_6u
-        if n == 'Bd_DstDs': #3
-            print 'Including Bd->D*Ds br variations'
-            # 3.1
-            _, wVar['brBd_DstDsUp'], wVar['brBd_DstDsDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 431}, inflateRate*1.1/8.0)
-            # 3.2
-            weights['brBd_DstDsst'], wVar['brBd_DstDsst'+category.name+'Up'], wVar['brBd_DstDsst'+category.name+'Down'] = computeBrVarWeights(ds, {'procId_DstHc': 302}, 0.5, centralVal=4.)
-            # 3.3
-            weights['brBd_DstDsst0'], wVar['brBd_DstDsst0Up'], wVar['brBd_DstDsst0Down'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 10431}, inflateRate*0.6/1.5, centralVal=1.)
-        if n == 'Bu_DstDu': #4
-            # 4.1
-            _, wVar['brBu_DstDuKUp'], wVar['brBu_DstDuKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421,
-                                                                                         'MC_StrangeDstSisPdgId': 311},
-                                                                                    inflateRate*0.4/3.8)
-            # 4.3, 4.5-7
-            _, x4_3u, x4_3d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 311}, inflateRate*1.2/9.2)
-            _, x4_5u, x4_5d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 321}, inflateRate*1.2/8.8)
-            wVar['brBu_DstDustKUp'] = x4_3u * x4_5u
-            wVar['brBu_DstDustKDown'] = x4_3d * x4_5d
-
-            # Correlate all K* decays (4.2, 4.4, 4.6-8)
-            x4_2, x4_2u, x4_2d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            x4_4, x4_4u, x4_4d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.)
-            x4_6, x4_6u, x4_6d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.)
-            weights['brBu_DstDuKst'] = x4_2 * x4_4 * x4_6
-            wVar['brBu_DstDuKstUp'] = x4_2u * x4_4u * x4_6u
-            wVar['brBu_DstDuKstDown'] = x4_2d * x4_4d * x4_6d
-
-            # 4.9, 4.10
-            _, x4_9u, x4_9d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 421, 'MC_StrangeDstSisPdgId': 0}, inflateRate*0.5/3.9)
-            _, x4_10u, x4_10d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 423, 'MC_StrangeDstSisPdgId': 0}, inflateRate*1.7/8.1)
-            wVar['brBu_DstDuUp'] = x4_9u * x4_10u
-            wVar['brBu_DstDuDown'] = x4_9d * x4_10d
-        if n == 'Bu_DstDd': #5
-            print 'Including Bu->D*Dd br variations'
-            # 5.1-3
-            _, wVar['brBu_DstDdKUp'], wVar['brBu_DstDdKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411,
-                                                                                         'MC_StrangeDstSisPdgId': 321},
-                                                                                    inflateRate*1.2/6.0)
-            # 5.5-7
-            _, wVar['brBu_DstDdstKUp'], wVar['brBu_DstDdstKDown'] = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413,
-                                                                                             'MC_StrangeDstSisPdgId': 321},
-                                                                                        inflateRate*0.6/4.4)
-            # Correlate all K* decays (5.2-4, 5.6-8)
-            x5_2, x5_2u, x5_2d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 411, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.0)
-            x5_6, x5_6u, x5_6d = computeBrVarWeights(ds, {'MC_CharmedDstSisPdgId': 413, 'MC_StrangeDstSisPdgId': 323}, 0.5, centralVal=4.0)
-            weights['brBu_DstDdKst'] = x5_2 * x5_6
-            wVar['brBu_DstDdKstUp'] = x5_2u * x5_6u
-            wVar['brBu_DstDdKstDown'] = x5_2d * x5_6d
-        if n == 'Bs_DstDs': #6
-            x6_2_4, x6_2_4u, x6_2_4d = computeBrVarWeights(ds, {'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.0)
-            weights['brBs_DstDsKst'] = x6_2_4
-            wVar['brBs_DstDsKstUp'] = x6_2_4u
-            wVar['brBs_DstDsKstDown'] = x6_2_4d
+        if re.match('B[usd]_DstD[usd]', n):
+            for name, proc_id, centralVal, relScale in DST_HC_PROCESSES:
+                weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
+                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale, absVal=False)
 
         if n == 'B_DstDXX':
             nnn = 'Bu_DstDXX_frac'
@@ -2961,6 +2830,15 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
                 'brDstPiPi_D2S_D2stPi',
                 'brDstPiPi_D1Pi', 'brDstPiPi_D1stPi', 'brDstPiPi_D2stPi']:
         card += nnn + ' shape'  + aux*nCat + '\n'
+
+    aux = ''
+    for p in processes:
+        if re.match('B[usd]_DstD[usd]', p):
+            aux += ' 1.'
+        else:
+            aux += ' -'
+    for nnn, proc_id, centralVal, relScale in DST_HC_PROCESSES:
+        card += nnn + ' shape'  + aux*nCat + '\n'
     # card += 'Dst2S_width shape' + aux*nCat + '\n'
     # card += 'brDstst_DststPi shape' + aux*nCat + '\n'
     # card += 'brD2420_DstPiPi shape' + aux*nCat + '\n'
@@ -2982,12 +2860,6 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
             out += prefix+n+' ' + type + aux*nCat + '\n'
         return out
 
-    card += brShapeSys(['Bd_DstDu'], ['Bd_DstDuK', 'Bd_DstDustK', 'Bd_DstDust', 'Bd_DstDuKst'])
-    card += brShapeSys(['Bd_DstDd'], ['Bd_DstDdK','Bd_DstDdstK','Bd_DstDdst','Bd_DstDd','Bd_DstDdKst'])
-    card += brShapeSys(['Bd_DstDs'], ['Bd_DstDs', 'Bd_DstDsst'+category.name, 'Bd_DstDsst0'])
-    card += brShapeSys(['Bu_DstDu'], ['Bu_DstDuK', 'Bu_DstDustK', 'Bu_DstDuKst', 'Bu_DstDu'])
-    card += brShapeSys(['Bu_DstDd'], ['Bu_DstDdK', 'Bu_DstDdstK', 'Bu_DstDdKst'])
-    card += brShapeSys(['Bs_DstDs'], ['Bs_DstDsKst']) # Threated all together in scale sys above
     card += brShapeSys(['B_DstDXX'], ['Bu_DstDXX_frac'], prefix='')
 
 
