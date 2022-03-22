@@ -1851,7 +1851,7 @@ def createHistograms(category):
                         'brDstPiPi_D2stPi':      (33,1,  0.5)}
 
             keepNorm = False
-            for nnn in names:
+            for nnn in br_dstst:
                 weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': br_dstst[nnn][0]}, relScale=br_dstst[nnn][2], centralVal=br_dstst[nnn][1], keepNorm=keepNorm)
 
         ############################
@@ -3090,6 +3090,8 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
                 'brDstPiPi_D1', 'brDstPiPi_D1st', 'brDstPiPi_D2st', 'brDstPiPi_D2Sst', 'brDstPiPi_D2Sst_D1Pi', 'brDstPiPi_D2Sst_D1stPi', 'brDstPiPi_D2Sst_D2stPi',
                 'brDstPiPi_D2S_D2stPi',
                 'brDstPiPi_D1Pi', 'brDstPiPi_D1stPi', 'brDstPiPi_D2stPi']:
+        card += nnn + ' shape'  + aux*nCat + '\n'
+    for nnn in dst_hc_processes:
         card += nnn + ' shape'  + aux*nCat + '\n'
     # card += 'Dst2S_width shape' + aux*nCat + '\n'
     # card += 'brDstst_DststPi shape' + aux*nCat + '\n'
