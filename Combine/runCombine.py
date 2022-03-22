@@ -1805,42 +1805,24 @@ def createHistograms(category):
             uncN = 'Dst2S_width'
             weights[uncN], wVar[uncN+'Up'], wVar[uncN+'Down'] = computeWidthVarWeights(ds, selItems=widthMods, relScale=0.3)
 
-            keepNorm=False
-            nnn = 'brDstPiPi_NR'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 0}, relScale=0.5, centralVal=1., keepNorm=keepNorm)
+            # Dictionary of all the B -> Mu Nu D** X decays
+            # The values are a tuple of (procId_Dstst, centralVal, relScale)
+            br_dstst = {'brDstPiPi_NR':          (0, 1,  0.5),
+                        'brDstPiPi_D1':          (1, 1,  0.5),
+                        'brDstPiPi_D1st':        (2, 1,  0.5),
+                        'brDstPiPi_D2st':        (3, 1,  0.5),
+                        'brDstPiPi_D2Sst':       (4, 1,  0.5),
+                        'brDstPiPi_D2Sst_D1Pi':  (11,0.5,0.5),
+                        'brDstPiPi_D2Sst_D1stPi':(12,0.5,0.5),
+                        'brDstPiPi_D2Sst_D2stPi':(13,0.5,0.5),
+                        'brDstPiPi_D2S_D2stPi':  (23,0.5,0.5),
+                        'brDstPiPi_D1Pi':        (31,1,  0.5),
+                        'brDstPiPi_D1stPi':      (32,1,  0.5),
+                        'brDstPiPi_D2stPi':      (33,1,  0.5)}
 
-            nnn = 'brDstPiPi_D1'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 1}, relScale=0.5, centralVal=1., keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D1st'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 2}, relScale=0.5, centralVal=1., keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D2st'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 3}, relScale=0.5, centralVal=1., keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D2Sst'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 4}, relScale=0.5, centralVal=1., keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D2Sst_D1Pi'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 11}, relScale=0.5, centralVal=0.5, keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D2Sst_D1stPi'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 12}, relScale=0.5, centralVal=0.5, keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D2Sst_D2stPi'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 13}, relScale=0.5, centralVal=0.5, keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D2S_D2stPi'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 23}, relScale=0.5, centralVal=0.5, keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D1Pi'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 31}, relScale=0.5, centralVal=1.0, keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D1stPi'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 32}, relScale=0.5, centralVal=1.0, keepNorm=keepNorm)
-
-            nnn = 'brDstPiPi_D2stPi'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': 33}, relScale=0.5, centralVal=1.0, keepNorm=keepNorm)
+            keepNorm = False
+            for nnn in names:
+                weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'procId_Dstst': br_dstst[nnn][0]}, relScale=br_dstst[nnn][2], centralVal=br_dstst[nnn][1], keepNorm=keepNorm)
 
         ############################
         # Hc mix variations
