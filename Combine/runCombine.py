@@ -47,6 +47,15 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
+# List of all known B -> D*Hc decays. You can find more information about each
+# of them at https://www.overleaf.com/read/ykppfynnfxdt, and how exactly they
+# are defined in B2DstMu_skimCAND_v1.py.
+#
+# The tuple has the following values:
+#     1. Parameter Name
+#     2. procId_DstHc (set in B2DstMu_skimCAND_v1.py)
+#     3. Central value (relative to Monte Carlo)
+#     4. Relative uncertainty
 DST_HC_PROCESSES = [\
     ('procid101',101,1,0.21/2.47), # 1.1
     ('procid102',102,4,0.5),       # 1.2 (not measured? x4)
@@ -72,7 +81,7 @@ DST_HC_PROCESSES = [\
     ('procid405',405,1,0.12/0.88), # 4.5, 4.7  
     ('procid406',406,1,0.5),       # 4.6, 4.8 (not measured?)
     ('procid409',409,1,0.05/0.39), # 4.9
-    ('procid410',410,1,0.17/0.81)  # 4.10
+    ('procid410',410,1,0.17/0.81), # 4.10
     ('procid450',450,1,0.5),       # (?)
     ('procid501',501,1,0.12/0.6),  # 5.1, 5.3
     ('procid502',502,1,0.5),       # 5.2, 5.4 (not measured?)
