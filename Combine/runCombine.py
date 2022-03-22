@@ -3465,6 +3465,9 @@ def runScan(tag, card, out, catName, rVal=SM_RDst, rLimits=[0.1, 0.7], nPoints=3
     if args.verbose:
         print output
 
+    with open(os.path.join(webFolder,'combine_output.log'), 'a') as f:
+        f.write(output)
+
     if dumpNuis:
         dumpNuisFromScan(tag, out)
 
