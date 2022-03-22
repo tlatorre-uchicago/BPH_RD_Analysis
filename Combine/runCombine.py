@@ -1224,6 +1224,36 @@ def createHistograms(category):
         ############################
         # From https://www.overleaf.com/read/ykppfynnfxdt
         inflateRate = 2.5
+        if re.match('B[usd]_DstD[usd]', n):
+            dst_hc_processes = [\
+                ('procid101',101,1,0.5)
+                ('procid102',102,1,0.5)
+                ('procid103',103,1,0.5)
+                ('procid104',104,1,0.5) 
+                ('procid105',105,1,0.5) # 1.5, 1.8
+                ('procid106',106,1,0.5) # 1.6, 1.9
+                ('procid107',107,1,0.5) # 1.7, 1.10
+                ('procid201',201,1,0.5) # 2.1, 2.2
+                ('procid203',203,1,0.5) # 2.3, 2.4
+                ('procid205',205,1,0.5) # 2.5, 2.8
+                ('procid206',206,1,0.5) # 2.6, 2.9
+                ('procid207',207,1,0.5) # 2.7, 2.10
+                ('procid211',211,1,0.5) # 2.11, 2.12
+                ('procid301',301,1,0.5)
+                ('procid302',302,1,0.5)
+                ('procid303',303,1,0.5)
+                ('procid401',401,1,0.5)
+                ('procid402',402,1,0.5)
+                ('procid403',403,1,0.5)
+                ('procid404',404,1,0.5) 
+                ('procid405',405,1,0.5)# 4.5, 4.7  
+                ('procid406',406,1,0.5)# 4.6, 4.8
+                ('procid409',409,1,0.5)
+                ('procid410',410,1,0.5)]
+
+            for name, proc_id, centralVal, relScale in dst_hc_processes:
+                weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
+                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale)
         if n == 'Bd_DstDu': #1
             print 'Including Bd->D*Du br variations'
             # 1.1
@@ -1533,7 +1563,7 @@ def createHistograms(category):
             raise
 
         ctrlVar_mod['ctrl_'+r] = [ -1, ctrlVar_counter[r[:2]] ]
-        ctrlVar_counter[r[:2]]+= 1
+        ctrlVar_counter[r[:2]] += 1
 
     for k in ctrlVar_mod.keys():
         ctrlVar_mod[k][0] = ctrlVar_counter[k[5:7]]
@@ -3012,7 +3042,7 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
                     aux += ' 0.5'
                 else:
                     aux += ' -'
-            card += 'B2Dst'+schemeFF+'{} shape'.format(n_pFF) + aux*nCat + '\n'
+            card += 'B2Dst'+schemeFF+'{} shapeU'.format(n_pFF) + aux*nCat + '\n'
 
 
     aux = ''
