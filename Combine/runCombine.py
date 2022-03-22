@@ -137,7 +137,8 @@ if args.HELP:
 if len(args.step) == 0:
     if args.category == 'comb':
         args.step = defaultPipelineComb
-    else: args.step = defaultPipelineSingle
+    else:
+        args.step = defaultPipelineSingle
 
     if args.cardTag == 'test_' and (not args.submit) and (not args.runInJob):
         args.step = ['clean'] + args.step
@@ -502,6 +503,7 @@ def loadDatasets(category, loadRD):
     else:
         addCuts = [
         ['M2_miss', 0.4, 1e3],
+        ['deltaM_DstD', 0.1445, 0.1475],
         # ['M2_miss', -0.2, 1e3],
         # ['mu_eta', -0.8, 0.8],
         # ['mu_eta', -1.5, 1.5],
