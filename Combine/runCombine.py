@@ -1279,7 +1279,7 @@ def createHistograms(category):
         if re.match('B[usd]_DstD[usd]', n):
             for name, proc_id, centralVal, relScale in DST_HC_PROCESSES:
                 weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
-                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale)
+                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale, absVal=False)
 
         if n == 'B_DstDXX':
             nnn = 'Bu_DstDXX_frac'
@@ -1788,7 +1788,7 @@ def createHistograms(category):
         if re.match('B[usd]_DstD[usd]', n):
             for name, proc_id, centralVal, relScale in DST_HC_PROCESSES:
                 weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
-                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale)
+                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale, absVal=False)
 
         if n == 'B_DstDXX':
             nnn = 'Bu_DstDXX_frac'
