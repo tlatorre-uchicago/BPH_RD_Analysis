@@ -2909,8 +2909,9 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
     def brScaleSys(name, relevantProcesses=[], relUnc=0.01):
         val = ' {:.2f}'.format(1+relUnc)
         aux = ''
-        if name not in processes:
-            raise ValueError("unknown sample '%s' % name")
+        for process in relevantProcesses:
+            if process not in processes:
+                raise ValueError("unknown process '%s'" % process)
 
         for nn in processes:
             if nn in relevantProcesses:
