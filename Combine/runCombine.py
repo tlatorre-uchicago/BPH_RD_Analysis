@@ -544,7 +544,8 @@ def loadDatasets(category, loadRD):
             for k in dSet.keys():
                 sel = np.ones_like(dSet[k]['q2']).astype(np.bool)
                 for var, low, high in addCuts:
-                    if var.startswith('ctrl_'): continue
+                    if var.startswith('ctrl_'):
+                        continue
                     if var not in dSet[k].columns:
                         print var, 'not in', k, 'main dataset'
                         raise
@@ -722,7 +723,9 @@ def createHistograms(category):
             x = x[selection]
         for i, (pt, eta) in enumerate(x):
             ix = hMuonIDSF.GetXaxis().FindBin(min(pt, ptmax))
-            if ix == 0: ix = 1 #Remove underflows (Meaning that the MC matching failed)
+            if ix == 0:
+                # Remove underflows (Meaning that the MC matching failed)
+                ix = 1
             iy = hMuonIDSF.GetYaxis().FindBin(min(np.abs(eta), etamax))
             muonSF[i] = hMuonIDSF.GetBinContent(ix, iy)
             muonSFUnc[i] = hMuonIDSF.GetBinError(hMuonIDSF.GetBin(ix, iy))
