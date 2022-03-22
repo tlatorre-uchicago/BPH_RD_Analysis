@@ -89,6 +89,14 @@ DST_HC_PROCESSES = [\
     ('procid621',621,1,0.5),       # (?)
     ('procid701',701,1,0.5),       # (?)
     ('procid702',702,1,0.5),       # (?)
+    ('procid_1',-1,0.1,0.5),       # No MC decay matching
+    ('procid_2',-2,0.1,0.5),       # B -> D* mu nu (slipped in)
+    ('procid_3',-3,0.1,0.5),       # B -> D* tau nu (slipped in)
+    ('procid_4',-4,0.1,0.5),       # B -> D** mu nu (slipped in)
+    ('procid_5',-5,0.1,0.5),       # Bs -> Ds** mu nu (slipped in)
+    ('procid_6',-6,0.1,0.5),       # D** tau nu splipped in
+    ('procid_100',-100,1,0.5),     # 4 or more bodies decay
+    ('procid_101',-101,1,0.5),     # D* from D**
 ]
 
 import argparse
@@ -2943,12 +2951,6 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
             out += prefix+n+' ' + type + aux*nCat + '\n'
         return out
 
-    #card += brShapeSys(['Bd_DstDu'], ['Bd_DstDuK', 'Bd_DstDustK', 'Bd_DstDust', 'Bd_DstDuKst'])
-    #card += brShapeSys(['Bd_DstDd'], ['Bd_DstDdK','Bd_DstDdstK','Bd_DstDdst','Bd_DstDd','Bd_DstDdKst'])
-    #card += brShapeSys(['Bd_DstDs'], ['Bd_DstDs', 'Bd_DstDsst'+category.name, 'Bd_DstDsst0'])
-    #card += brShapeSys(['Bu_DstDu'], ['Bu_DstDuK', 'Bu_DstDustK', 'Bu_DstDuKst', 'Bu_DstDu'])
-    #card += brShapeSys(['Bu_DstDd'], ['Bu_DstDdK', 'Bu_DstDdstK', 'Bu_DstDdKst'])
-    #card += brShapeSys(['Bs_DstDs'], ['Bs_DstDsKst']) # Threated all together in scale sys above
     card += brShapeSys(['B_DstDXX'], ['Bu_DstDXX_frac'], prefix='')
 
 
