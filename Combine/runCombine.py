@@ -241,8 +241,7 @@ if not os.path.isdir(outdir):
 card_location = basedir + 'Combine/cards/{}.txt'.format(card_name)
 histo_file_dir = basedir + 'data/_root/histos4combine/'
 
-userName = basedir[basedir.find('/user/')+6:].split('/')[0]
-webFolder = '/storage/af/user/'+userName+'/public_html/BPH_RDst/Combine/' + card_name
+webFolder = os.path.join(os.path.expanduser("~"),'public_html/BPH_RDst/Combine/%s' % card_name)
 if not os.path.isdir(webFolder):
     os.makedirs(webFolder)
     os.system('cp '+webFolder+'/../index.php '+webFolder)
@@ -344,8 +343,6 @@ controlRegSel['pp'] = selfun__TkPlusPlus
 corrScaleFactors = {}
 def loadDatasets(category, loadRD):
     print 'Loading MC datasets'
-    #They all have to be produced with the same pileup
-    # candDir='ntuples_B2DstMu_mediumId_lostInnerHits'
     candDir='ntuples_B2DstMu_220311'
     print 'Using candDir =', candDir
     print 'Using skim = skimmed'+args.skimmedTag
@@ -2960,8 +2957,10 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
     ######################################################
     mcProcStr = ''
     for p in processes:
-        if 'data' in p: mcProcStr += ' -'
-        else: mcProcStr += ' 1.'
+        if 'data' in p:
+            mcProcStr += ' -'
+        else:
+            mcProcStr += ' 1.'
 
     for ax in ['x', 'y']:
         card += category.name+'BS'+ax+' shape' + mcProcStr*nCat + '\n'
@@ -2981,7 +2980,9 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
     for c in categories:
         if c.startswith('ctrl_'):
             aux += mcProcStr
-        else: aux += ' -'*nProc
+        else:
+            aux += ' -'*nProc
+
     if '1.' in aux:
         auxTag = '' if args.correlate_tkPVfrac else category.name
         card += 'randTksPV'+auxTag+' shape' + aux + '\n'
