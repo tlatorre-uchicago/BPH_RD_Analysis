@@ -47,6 +47,32 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
+DST_HC_PROCESSES = [\
+    ('procid101',101,1,0.5)
+    ('procid102',102,1,0.5)
+    ('procid103',103,1,0.5)
+    ('procid104',104,1,0.5) 
+    ('procid105',105,1,0.5) # 1.5, 1.8
+    ('procid106',106,1,0.5) # 1.6, 1.9
+    ('procid107',107,1,0.5) # 1.7, 1.10
+    ('procid201',201,1,0.5) # 2.1, 2.2
+    ('procid203',203,1,0.5) # 2.3, 2.4
+    ('procid205',205,1,0.5) # 2.5, 2.8
+    ('procid206',206,1,0.5) # 2.6, 2.9
+    ('procid207',207,1,0.5) # 2.7, 2.10
+    ('procid211',211,1,0.5) # 2.11, 2.12
+    ('procid301',301,1,0.5)
+    ('procid302',302,1,0.5)
+    ('procid303',303,1,0.5)
+    ('procid401',401,1,0.5)
+    ('procid402',402,1,0.5)
+    ('procid403',403,1,0.5)
+    ('procid404',404,1,0.5) 
+    ('procid405',405,1,0.5)# 4.5, 4.7  
+    ('procid406',406,1,0.5)# 4.6, 4.8
+    ('procid409',409,1,0.5)
+    ('procid410',410,1,0.5)]
+
 import argparse
 parser = argparse.ArgumentParser(description='Script used to run combine on the R(D*) analysis.',
                                  epilog='Test example: ./runCombine.py -c low',
@@ -1225,35 +1251,10 @@ def createHistograms(category):
         # From https://www.overleaf.com/read/ykppfynnfxdt
         inflateRate = 2.5
         if re.match('B[usd]_DstD[usd]', n):
-            dst_hc_processes = [\
-                ('procid101',101,1,0.5)
-                ('procid102',102,1,0.5)
-                ('procid103',103,1,0.5)
-                ('procid104',104,1,0.5) 
-                ('procid105',105,1,0.5) # 1.5, 1.8
-                ('procid106',106,1,0.5) # 1.6, 1.9
-                ('procid107',107,1,0.5) # 1.7, 1.10
-                ('procid201',201,1,0.5) # 2.1, 2.2
-                ('procid203',203,1,0.5) # 2.3, 2.4
-                ('procid205',205,1,0.5) # 2.5, 2.8
-                ('procid206',206,1,0.5) # 2.6, 2.9
-                ('procid207',207,1,0.5) # 2.7, 2.10
-                ('procid211',211,1,0.5) # 2.11, 2.12
-                ('procid301',301,1,0.5)
-                ('procid302',302,1,0.5)
-                ('procid303',303,1,0.5)
-                ('procid401',401,1,0.5)
-                ('procid402',402,1,0.5)
-                ('procid403',403,1,0.5)
-                ('procid404',404,1,0.5) 
-                ('procid405',405,1,0.5)# 4.5, 4.7  
-                ('procid406',406,1,0.5)# 4.6, 4.8
-                ('procid409',409,1,0.5)
-                ('procid410',410,1,0.5)]
-
-            for name, proc_id, centralVal, relScale in dst_hc_processes:
+            for name, proc_id, centralVal, relScale in DST_HC_PROCESSES:
                 weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
                     computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale)
+
         if n == 'Bd_DstDu': #1
             print 'Including Bd->D*Du br variations'
             # 1.1
@@ -1859,6 +1860,11 @@ def createHistograms(category):
         ############################
         # From https://www.overleaf.com/read/ykppfynnfxdt
         inflateRate = 2.5
+        if re.match('B[usd]_DstD[usd]', n):
+            for name, proc_id, centralVal, relScale in DST_HC_PROCESSES:
+                weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
+                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale)
+
         if n == 'Bd_DstDu': #1
             print 'Including Bd->D*Du br variations'
             # 1.1
@@ -3091,7 +3097,7 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
                 'brDstPiPi_D2S_D2stPi',
                 'brDstPiPi_D1Pi', 'brDstPiPi_D1stPi', 'brDstPiPi_D2stPi']:
         card += nnn + ' shape'  + aux*nCat + '\n'
-    for nnn in dst_hc_processes:
+    for nnn in DST_HC_PROCESSES:
         card += nnn + ' shape'  + aux*nCat + '\n'
     # card += 'Dst2S_width shape' + aux*nCat + '\n'
     # card += 'brDstst_DststPi shape' + aux*nCat + '\n'
