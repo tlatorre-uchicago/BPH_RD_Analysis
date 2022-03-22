@@ -49,29 +49,47 @@ donotdelete = []
 
 DST_HC_PROCESSES = [\
     ('procid101',101,1,0.21/2.47), # 1.1
-    ('procid102',102,4,0.5),       # 1.2 (central val should be 1?)
+    ('procid102',102,4,0.5),       # 1.2 (not measured? artificially increased)
     ('procid103',103,1,0.9/10.6),  # 1.3
-    ('procid104',104,4,0.5),       # 1.4 (central val should be 1?)
+    ('procid104',104,4,0.5),       # 1.4 (not measured? artificially increased)
     ('procid105',105,1,0.47/5.43), # 1.5, 1.8
-    ('procid106',106,4,0.5),       # 1.6, 1.9 (central val should be 1?)
-    ('procid107',107,1,0.5),       # 1.7, 1.10
-    ('procid201',201,1,0.5),       # 2.1, 2.2
-    ('procid203',203,1,0.5),       # 2.3, 2.4
-    ('procid205',205,1,0.5),       # 2.5, 2.8
-    ('procid206',206,1,0.5),       # 2.6, 2.9
-    ('procid207',207,1,0.5),       # 2.7, 2.10
-    ('procid211',211,1,0.5),       # 2.11, 2.12
-    ('procid301',301,1,0.5),
-    ('procid302',302,1,0.5),
-    ('procid303',303,1,0.5),
-    ('procid401',401,1,0.5),
-    ('procid402',402,1,0.5),
-    ('procid403',403,1,0.5),
-    ('procid404',404,1,0.5),
-    ('procid405',405,1,0.5), # 4.5, 4.7  
-    ('procid406',406,1,0.5), # 4.6, 4.8
-    ('procid409',409,1,0.5),
-    ('procid410',410,1,0.5)]
+    ('procid106',106,4,0.5),       # 1.6, 1.9 (not measured? artificially increased)
+    ('procid107',107,1,0.04/0.54), # 1.7, 1.10
+    ('procid201',201,1,0.25/3.2),  # 2.1, 2.2
+    ('procid203',203,1,0.5),       # 2.3, 2.4 (not measured?)
+    ('procid205',205,1,0.23/2.67), # 2.5, 2.8
+    ('procid206',206,1,0.5),       # 2.6, 2.9 (not measured?)
+    ('procid207',207,1,0.02/0.26), # 2.7, 2.10
+    ('procid211',211,1,0.15/0.61), # 2.11, 2.12
+    ('procid301',301,1,1.1/8),     # 3.1
+    #('procid302',302,1,0.14/17.7), # 3.2
+    ('procid302',302,4,0.5),       # 3.2 (artificially increased to 4)
+    ('procid303',303,1,0.6/1.5),   # 3.3
+    ('procid401',401,1,0.4/3.8),   # 4.1
+    ('procid402',402,1,0.5),       # 4.2 (not measured?)
+    ('procid403',403,1,1.2/9.2),   # 4.3
+    ('procid404',404,1,0.5),       # 4.4 (not measured?)
+    ('procid405',405,1,0.12/0.88), # 4.5, 4.7  
+    ('procid406',406,1,0.5),       # 4.6, 4.8 (not measured?)
+    ('procid409',409,1,0.05/0.39), # 4.9
+    ('procid410',410,1,0.17/0.81)  # 4.10
+    ('procid450',450,1,0.5),       # (?)
+    ('procid501',501,1,0.12/0.6),  # 5.1, 5.3
+    ('procid502',502,1,0.5),       # 5.2, 5.4 (not measured?)
+    ('procid505',505,1,0.06/0.44), # 5.5, 5.7
+    ('procid506',506,1,0.5),       # 5.6, 5.8 (not measured?)
+    ('procid520',520,1,0.5),       # (?)
+    ('procid601',601,1,0.5),       # Not measured
+    ('procid602',602,1,0.5),       # Not measured
+    ('procid603',603,1,0.5),       # Not measured
+    ('procid604',604,1,0.5),       # Not measured
+    ('procid605',605,1,0.5),       # Not measured
+    ('procid606',606,1,0.5),       # (?)
+    ('procid620',620,1,0.5),       # (?)
+    ('procid621',621,1,0.5),       # (?)
+    ('procid701',701,1,0.5),       # (?)
+    ('procid702',702,1,0.5),       # (?)
+]
 
 import argparse
 parser = argparse.ArgumentParser(description='Script used to run combine on the R(D*) analysis.',
@@ -3100,7 +3118,7 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
 
     aux = ''
     for p in processes:
-        if re.match('B[usd]_DstD[usd]', n):
+        if re.match('B[usd]_DstD[usd]', p):
             aux += ' 1.'
         else:
             aux += ' -'
