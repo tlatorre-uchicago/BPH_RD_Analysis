@@ -1273,12 +1273,6 @@ def createHistograms(category):
                 weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
                     computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale)
 
-        if n == 'Bs_DstDs': #6
-            x6_2_4, x6_2_4u, x6_2_4d = computeBrVarWeights(ds, {'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.0)
-            weights['brBs_DstDsKst'] = x6_2_4
-            wVar['brBs_DstDsKstUp'] = x6_2_4u
-            wVar['brBs_DstDsKstDown'] = x6_2_4d
-
         if n == 'B_DstDXX':
             nnn = 'Bu_DstDXX_frac'
             weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521}, relScale=0.5, centralVal=2., keepNorm=True)
@@ -1787,12 +1781,6 @@ def createHistograms(category):
             for name, proc_id, centralVal, relScale in DST_HC_PROCESSES:
                 weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
                     computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale)
-
-        if n == 'Bs_DstDs': #6
-            x6_2_4, x6_2_4u, x6_2_4d = computeBrVarWeights(ds, {'MC_StrangeDstSisPdgId': 313}, 0.5, centralVal=4.0)
-            weights['brBs_DstDsKst'] = x6_2_4
-            wVar['brBs_DstDsKstUp'] = x6_2_4u
-            wVar['brBs_DstDsKstDown'] = x6_2_4d
 
         if n == 'B_DstDXX':
             nnn = 'Bu_DstDXX_frac'
@@ -2955,12 +2943,12 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
             out += prefix+n+' ' + type + aux*nCat + '\n'
         return out
 
-    card += brShapeSys(['Bd_DstDu'], ['Bd_DstDuK', 'Bd_DstDustK', 'Bd_DstDust', 'Bd_DstDuKst'])
-    card += brShapeSys(['Bd_DstDd'], ['Bd_DstDdK','Bd_DstDdstK','Bd_DstDdst','Bd_DstDd','Bd_DstDdKst'])
-    card += brShapeSys(['Bd_DstDs'], ['Bd_DstDs', 'Bd_DstDsst'+category.name, 'Bd_DstDsst0'])
-    card += brShapeSys(['Bu_DstDu'], ['Bu_DstDuK', 'Bu_DstDustK', 'Bu_DstDuKst', 'Bu_DstDu'])
-    card += brShapeSys(['Bu_DstDd'], ['Bu_DstDdK', 'Bu_DstDdstK', 'Bu_DstDdKst'])
-    card += brShapeSys(['Bs_DstDs'], ['Bs_DstDsKst']) # Threated all together in scale sys above
+    #card += brShapeSys(['Bd_DstDu'], ['Bd_DstDuK', 'Bd_DstDustK', 'Bd_DstDust', 'Bd_DstDuKst'])
+    #card += brShapeSys(['Bd_DstDd'], ['Bd_DstDdK','Bd_DstDdstK','Bd_DstDdst','Bd_DstDd','Bd_DstDdKst'])
+    #card += brShapeSys(['Bd_DstDs'], ['Bd_DstDs', 'Bd_DstDsst'+category.name, 'Bd_DstDsst0'])
+    #card += brShapeSys(['Bu_DstDu'], ['Bu_DstDuK', 'Bu_DstDustK', 'Bu_DstDuKst', 'Bu_DstDu'])
+    #card += brShapeSys(['Bu_DstDd'], ['Bu_DstDdK', 'Bu_DstDdstK', 'Bu_DstDdKst'])
+    #card += brShapeSys(['Bs_DstDs'], ['Bs_DstDsKst']) # Threated all together in scale sys above
     card += brShapeSys(['B_DstDXX'], ['Bu_DstDXX_frac'], prefix='')
 
 
