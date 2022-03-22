@@ -1676,6 +1676,7 @@ def createHistograms(category):
             print 'Normalization change: {:.3f}'.format(np.sum(weights[cname][orig])/ float(weights[cname][orig].shape[0]))
             for k in auxVarDic.keys():
                 wVar[k] = np.where(sel, auxVarDic[k] *  np.sum(sel) / np.sum((weights[cname]*auxVarDic[k])[sel]), 1. )
+                print("blah k ", k)
             # Now, apply the same correction to duplicate tracks
             sel = (ds['MC_tkFromMainB_0'] < 0.5) & ~orig
             weights[cname] *= np.where(sel, w * np.sum(sel) / np.sum(w[sel]), 1)
@@ -2012,6 +2013,7 @@ def createHistograms(category):
 
 
         for name_wVar, v_wVar in wVar.iteritems():
+            print("name_wVar = ", name_wVar)
             h_name = n
             if not name_wVar == '':
                 h_name += '__' + name_wVar
@@ -2026,6 +2028,7 @@ def createHistograms(category):
                     if m > 1:
                         auxSel = np.logical_and( np.mod(ds['index'], m) == j, auxSel )
 
+                print("creating histo[%s][%s]" % (str(k),h_name))
                 histo[k][h_name] = create_TH1D(ds[var][auxSel],
                                                name=h_name, title=h_name,
                                                binning=binning[k],
@@ -2983,13 +2986,18 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
         else:
             aux += ' -'*nProc
 
+    print("histo keys = ", histo.keys())
+    for k in histo.values()[0].keys():
+        print("blah before ", k)
+
     if '1.' in aux:
         auxTag = '' if args.correlate_tkPVfrac else category.name
         card += 'randTksPV'+auxTag+' shape' + aux + '\n'
         card += 'randTksPU'+auxTag+' shape' + aux + '\n'
 
         cname = 'addTk_pt_cali_'+category.name
-        for k in histo.values()[0].keys():
+        for k in histo['ctrl_p__mHad'].keys():
+            print("blah ", k)
             if k.startswith(processOrder[0]+'__'+cname) and k.endswith('Up'):
                 n = k[k.find('__')+2:-2]
                 print n
