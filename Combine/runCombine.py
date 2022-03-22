@@ -3089,9 +3089,15 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
     # Hc mix composition
     def brShapeSys(relevantSamples=[], shapeNames=[], prefix='br'):
         aux = ''
+        for name in relevantSamples:
+            if name not in processes:
+                raise ValueError("unknown sample '%s' % name")
+
         for p in processes:
-            if p in relevantSamples: aux += ' 1.'
-            else: aux += ' -'
+            if p in relevantSamples:
+                aux += ' 1.'
+            else:
+                aux += ' -'
         out = ''
 
         for n in shapeNames:
