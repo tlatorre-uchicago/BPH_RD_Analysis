@@ -47,7 +47,7 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
-def get_ctrl_weights(ds,pt_lo=0,pt_high=1,fraction=0.3,epsilon=1e-10):
+def get_ctrl_weights(ds,pt_lo=0,pt_hi=1,fraction=0.3,epsilon=1e-10):
     """
     Returns weights for events which move between control regions due to the
     lowest pt track not getting reconstructed. For example, if extra tracks in
