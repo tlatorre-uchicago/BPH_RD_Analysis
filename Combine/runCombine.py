@@ -1649,9 +1649,10 @@ def createHistograms(category):
         # Hc mix variations
         ############################
         # From https://www.overleaf.com/read/ykppfynnfxdt
-        for name, proc_id, centralVal, relScale, inflateRate in DST_HC_PROCESSES:
-            weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
-                computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale, absVal=False)
+        if re.match('B[usd]_DstD[usd]', n):
+            for name, proc_id, centralVal, relScale, inflateRate in DST_HC_PROCESSES:
+                weights[name], wVar[name + 'Up'], wVar[name + 'Down'] = \
+                    computeBrVarWeights(ds, {'procId_DstHc': proc_id}, centralVal=centralVal, relScale=inflateRate*relScale, absVal=False)
 
         if n == 'B_DstDXX':
             nnn = 'Bu_DstDXX_frac'
