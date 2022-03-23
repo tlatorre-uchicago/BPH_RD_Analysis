@@ -114,7 +114,7 @@ def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     """
     orig = ds['ctrl'] == ds['ctrl2']
     w = np.where(orig,1,epsilon).astype(float)
-    down = np.ones_like(ds['mu_pt'])
+    down = w
 
     # The conditions here are:
     #
