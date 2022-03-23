@@ -47,6 +47,23 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
+def get_ctrl_weights(ds,pt_lo=0,pt_high=1,fraction=0.3,epsilon=1e-10):
+    w = np.where(ds['ctrl'] == ds['ctrl2'],1,epsilon).astype(float)
+    down = np.ones_like(ds['mu_pt'])
+
+    # The conditions here are:
+    #
+    #     1. This is an original event with no extra tracks.
+    #     2. This is an original event which got moved.
+    #     3. This is an original event which didn't get moved.
+    #     4. This is a duplicate event which got moved.
+    #     5. This is a duplicate event which didn't get moved.
+    orig = ds['ctrl'] == ds['ctrl2']
+    pt = (ds['tkPt_last'] > pt_lo) & (ds['tkPt_last'] < pt_hi)
+    condlist = [orig & (ds['ctrl'] == 0), orig & pt, orig & ~pt, ~orig & pt, ~orig & ~pt]
+    up = np.select(condlist,[1,1-fraction,1,fraction,0])
+    return w, up/w, down/w
+
 import argparse
 parser = argparse.ArgumentParser(description='Script used to run combine on the R(D*) analysis.',
                                  epilog='Test example: ./runCombine.py -c low',
@@ -940,22 +957,7 @@ def createHistograms(category):
         wVar = {}
         weights = {}
         if 'data' not in n:
-            weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
-
-            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
-            # The conditions here are:
-            #
-            #     1. This is an original event with no extra tracks.
-            #     2. This is an original event which got moved.
-            #     3. This is an original event which didn't get moved.
-            #     4. This is a duplicate event which got moved.
-            #     5. This is a duplicate event which didn't get moved.
-            condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
-                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
-                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
+            weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1553,21 +1555,7 @@ def createHistograms(category):
         wVar = {}
         weights = {}
         if 'data' not in n:
-            weights['ctrl'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0).astype(float)
-            wVar['ctrlDown'] = np.where(ds['ctrl'] == ds['ctrl2'],1,0)
-            # The conditions here are:
-            #
-            #     1. This is an original event with no extra tracks.
-            #     2. This is an original event which got moved.
-            #     3. This is an original event which didn't get moved.
-            #     4. This is a duplicate event which got moved.
-            #     5. This is a duplicate event which didn't get moved.
-            condlist = [(ds['ctrl'] == ds['ctrl2']) & (ds['ctrl'] == 0),
-                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-                        (ds['ctrl'] == ds['ctrl2']) & (ds['tkPt_last'] >= 1.0),
-                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] < 1.0),
-                        (ds['ctrl'] != ds['ctrl2']) & (ds['tkPt_last'] >= 1.0)]
-            wVar['ctrlUp'] = np.select(condlist,[1,0.1,1,0.9,0])
+            weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
