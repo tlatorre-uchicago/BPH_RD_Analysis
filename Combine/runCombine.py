@@ -50,11 +50,19 @@ donotdelete = []
 def get_ctrl_weights(ds,pt_lo=0,pt_high=1,fraction=0.3,epsilon=1e-10):
     """
     Returns weights for events which move between control regions due to the
-    lowest pt track not getting reconstructed. Returns a tuple of (weight, up,
-    down), where weight is the default weights, up is the weights for when
-    events move divided by the original weights, and down is the weights for
-    when data is *more* likely to reconstruct extra tracks (currently assumed
-    to not happen, so we just return the original weights).
+    lowest pt track not getting reconstructed. For example, if extra tracks in
+    data are less likely to be reconstructed or pass the goodness of fit tests
+    with the vertex, they will end up being in a different control region. The
+    possible movements of the events are: ppp -> pp, ppm -> pp, pmp -> pm, pmm
+    -> pm, mmp -> mm, mmm -> mm, ,pm -> p, mp -> m, p -> signal, m -> signal.
+
+    Returns a tuple (weight, up, down), where weight is the default weights
+    (which assigns `epsilon` to all duplicate events and 1 to all original
+    events), up is the weights for when events move divided by the original
+    weights, and down is the weights for when data is *more* likely to
+    reconstruct extra tracks divided by the original weights (currently assumed
+    to not happen, since this seems unlikely and there is no way currently to
+    know the pt of tracks which *almost* got reconstructed).
 
     Args:
         - ds: dataframe of events
