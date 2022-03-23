@@ -47,7 +47,7 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
-def get_ctrl_weights(ds,pt_lo=0,pt_hi=1,fraction=0.3,epsilon=1e-10):
+def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     """
     Returns weights for events which move between control regions due to the
     lowest pt track not getting reconstructed. For example, if extra tracks in
@@ -66,9 +66,10 @@ def get_ctrl_weights(ds,pt_lo=0,pt_hi=1,fraction=0.3,epsilon=1e-10):
 
     Args:
         - ds: dataframe of events
-        - pt_lo: the lowest pt of events being moved
-        - pt_hi: the highest pt of events being moved
-        - fraction: the fraction of events whose lowest pt track falls in between `pt_lo` and `pt_hi` which are moved
+        - pt_min: the minimum pt of events being moved
+        - pt_max: the maximum pt of events being moved
+        - fraction: the fraction of events whose lowest pt track falls in
+              between `pt_min` and `pt_max` which are moved
         - epsilon: small weight given to duplicate events
     """
     w = np.where(ds['ctrl'] == ds['ctrl2'],1,epsilon).astype(float)
@@ -82,7 +83,7 @@ def get_ctrl_weights(ds,pt_lo=0,pt_hi=1,fraction=0.3,epsilon=1e-10):
     #     4. This is a duplicate event which got moved.
     #     5. This is a duplicate event which didn't get moved.
     orig = ds['ctrl'] == ds['ctrl2']
-    pt = (ds['tkPt_last'] > pt_lo) & (ds['tkPt_last'] < pt_hi)
+    pt = (ds['tkPt_last'] > pt_min) & (ds['tkPt_last'] < pt_max)
     condlist = [orig & (ds['ctrl'] == 0),
                 orig & pt,
                 orig & ~pt,
