@@ -47,6 +47,40 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
+def get_ctrl_group(ds):
+    """
+    Add a column specifying the control region. Here, the control region number
+    is sort of like the control region expressed as an integer. It is a three
+    digit number where the number in the least significant digit represents the
+    charge of the first track (1 for positive, 2 for negative), the next digit
+    represents the charge of the second track, etc.
+
+    For example, ctrl == 0 represents the signal region, ctrl == 200 represents
+    the minus control region, etc.
+
+    The nice thing about this representation is that if you want to find out what
+    would happen if you didn't reconstruct the lowest pt track, you can just
+    compute ctrl//10. For example:
+
+        >>> ctrl = 222
+        >>> ctrl//10
+        22
+
+    This allows us to compute what would happen if events moved between the
+    control groups.
+    """
+    tk0 = np.where(ds['tkCharge_0'] == -1, 2, ds['tkCharge_0']).astype(int)
+    tk1 = np.where(ds['tkCharge_1'] == -1, 2, ds['tkCharge_1']).astype(int)
+    tk2 = np.where(ds['tkCharge_2'] == -1, 2, ds['tkCharge_2']).astype(int)
+    condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
+    choicelist = np.array([np.zeros_like(tk0),tk0,tk0*10+tk1,tk0*100+tk1*10+tk2,tk0*100+tk1*10+tk2])
+    return np.select(condlist,choicelist)
+
+def get_min_pt(ds):
+    condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
+    choicelist = np.array([np.zeros_like(ds['tkPt_0']),ds['tkPt_0'],ds['tkPt_1'],ds['tkPt_2'],ds['tkPt_2']])
+    return np.select(condlist,choicelist)
+
 def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     """
     Returns weights for events which move between control regions due to the
@@ -78,7 +112,8 @@ def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     epsilon: float
         Small weight given to duplicate events.
     """
-    w = np.where(ds['ctrl'] == ds['ctrl2'],1,epsilon).astype(float)
+    orig = ds['ctrl'] == ds['ctrl2']
+    w = np.where(orig,1,epsilon).astype(float)
     down = np.ones_like(ds['mu_pt'])
 
     # The conditions here are:
@@ -88,7 +123,6 @@ def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     #     3. This is an original event which didn't get moved.
     #     4. This is a duplicate event which got moved.
     #     5. This is a duplicate event which didn't get moved.
-    orig = ds['ctrl'] == ds['ctrl2']
     pt = (ds['tkPt_last'] > pt_min) & (ds['tkPt_last'] < pt_max)
     condlist = [orig & (ds['ctrl'] == 0),
                 orig & pt,
@@ -460,38 +494,6 @@ def loadDatasets(category, loadRD):
         locRD = dataDir+'/skimmed'+args.skimmedTag+'/B2DstMu_{}_{}'.format(creation_date, category.name)
         dSet['data'] = pd.DataFrame(rtnp.root2array(locRD + '_corr.root'))
         dSetTkSide['data'] = pd.DataFrame(rtnp.root2array(locRD + '_trkCtrl_corr.root'))
-
-    # Add a column specifying the control region. Here, the control region
-    # number is sort of like the control region expressed as an integer. It is
-    # a three digit number where the number in the least significant digit
-    # represents the charge of the first track (1 for positive, 2 for
-    # negative), the next digit represents the charge of the second track, etc.
-    #
-    # For example, ctrl == 0 represents the signal region, ctrl == 200
-    # represents the minus control region, etc.
-    #
-    # The nice thing about this representation is that if you want to find out
-    # what would happen if you didn't reconstruct the lowest pt track, you can
-    # just compute ctrl//10. For example:
-    #
-    #     >>> ctrl = 222
-    #     >>> ctrl//10
-    #     22
-    #
-    # This allows us to compute what would happen if events moved between the
-    # control groups.
-    def get_ctrl_group(ds):
-        tk0 = np.where(ds['tkCharge_0'] == -1, 2, ds['tkCharge_0']).astype(int)
-        tk1 = np.where(ds['tkCharge_1'] == -1, 2, ds['tkCharge_1']).astype(int)
-        tk2 = np.where(ds['tkCharge_2'] == -1, 2, ds['tkCharge_2']).astype(int)
-        condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
-        choicelist = np.array([np.zeros_like(tk0),tk0,tk0*10+tk1,tk0*100+tk1*10+tk2,tk0*100+tk1*10+tk2])
-        return np.select(condlist,choicelist)
-
-    def get_min_pt(ds):
-        condlist = [ds['N_goodAddTks'] == 0,ds['N_goodAddTks'] == 1,ds['N_goodAddTks'] == 2,ds['N_goodAddTks'] == 3,ds['N_goodAddTks'] > 3]
-        choicelist = np.array([np.zeros_like(ds['tkPt_0']),ds['tkPt_0'],ds['tkPt_1'],ds['tkPt_2'],ds['tkPt_2']])
-        return np.select(condlist,choicelist)
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
