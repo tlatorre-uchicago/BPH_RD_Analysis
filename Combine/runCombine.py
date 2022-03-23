@@ -57,57 +57,7 @@ donotdelete = []
 #     3. Central value (relative to Monte Carlo)
 #     4. Relative uncertainty
 #     5. Multiplication factor for relative uncertainty
-DST_HC_PROCESSES = [\
-    ('procid101',101,1,0.21/2.47,1),   # 1.1
-    ('procid102',102,4,0.5,1),         # 1.2 (not measured? x4,1)
-    ('procid103',103,1,0.9/10.6,2.5),  # 1.3
-    ('procid104',104,4,0.5,1),         # 1.4 (not measured? x4,1)
-    ('procid105',105,1,0.47/5.43,2.5), # 1.5, 1.8
-    ('procid106',106,4,0.5,1),         # 1.6, 1.9 (not measured? x4,1)
-    ('procid107',107,1,0.04/0.54,2.5), # 1.7, 1.10
-    ('procid201',201,1,0.25/3.2,2.5),  # 2.1, 2.2
-    ('procid203',203,1,0.5,1),         # 2.3, 2.4 (not measured?,1)
-    ('procid205',205,1,0.23/2.67,2.5), # 2.5, 2.8
-    ('procid206',206,1,0.5,1),         # 2.6, 2.9 (not measured?,1)
-    ('procid207',207,1,0.02/0.26,2.5), # 2.7, 2.10
-    ('procid211',211,1,0.15/0.61,2.5), # 2.11, 2.12
-    ('procid301',301,1,1.1/8,2.5),     # 3.1
-    #('procid302',302,1,0.14/17.7,1),   # 3.2
-    ('procid302',302,4,0.5,1),         # 3.2 (x4,1)
-    ('procid303',303,1,0.6/1.5,2.5),   # 3.3
-    ('procid401',401,1,0.4/3.8,2.5),   # 4.1
-    ('procid402',402,1,0.5,1),         # 4.2 (not measured?,1)
-    ('procid403',403,1,1.2/9.2,2.5),   # 4.3
-    ('procid404',404,1,0.5,1),         # 4.4 (not measured?,1)
-    ('procid405',405,1,0.12/0.88,2.5), # 4.5, 4.7
-    ('procid406',406,1,0.5,1),         # 4.6, 4.8 (not measured?,1)
-    ('procid409',409,1,0.05/0.39,2.5), # 4.9
-    ('procid410',410,1,0.17/0.81,2.5), # 4.10
-    ('procid450',450,1,0.5,1),         # (?,1)
-    ('procid501',501,1,0.12/0.6,2.5),  # 5.1, 5.3
-    ('procid502',502,1,0.5,1),         # 5.2, 5.4 (not measured?,1)
-    ('procid505',505,1,0.06/0.44,2.5), # 5.5, 5.7
-    ('procid506',506,1,0.5,1),         # 5.6, 5.8 (not measured?,1)
-    ('procid520',520,1,0.5,1),         # (?,1)
-    ('procid601',601,1,0.5,1),         # Not measured
-    ('procid602',602,1,0.5,1),         # Not measured
-    ('procid603',603,1,0.5,1),         # Not measured
-    ('procid604',604,1,0.5,1),         # Not measured
-    ('procid605',605,1,0.5,1),         # Not measured
-    ('procid606',606,1,0.5,1),         # (?,1)
-    ('procid620',620,1,0.5,1),         # (?,1)
-    ('procid621',621,1,0.5,1),         # (?,1)
-    ('procid701',701,1,0.5,1),         # (?,1)
-    ('procid702',702,1,0.5,1),         # (?,1)
-    ('procid_1',-1,0.1,0.5,1),         # No MC decay matching
-    ('procid_2',-2,0.1,0.5,1),         # B -> D* mu nu (slipped in,1)
-    ('procid_3',-3,0.1,0.5,1),         # B -> D* tau nu (slipped in,1)
-    ('procid_4',-4,0.1,0.5,1),         # B -> D** mu nu (slipped in,1)
-    ('procid_5',-5,0.1,0.5,1),         # Bs -> Ds** mu nu (slipped in,1)
-    ('procid_6',-6,0.1,0.5,1),         # D** tau nu splipped in
-    ('procid_100',-100,1,0.5,1),       # 4 or more bodies decay
-    ('procid_101',-101,1,0.5,1),       # D* from D**
-]
+DST_HC_PROCESSES = np.genfromtxt("dst_hc_processes.txt",dtype=None)
 
 import argparse
 parser = argparse.ArgumentParser(description='Script used to run combine on the R(D*) analysis.',
