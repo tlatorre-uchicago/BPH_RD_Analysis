@@ -124,20 +124,20 @@ def getEff(k,N):
     de = np.sqrt(e*(1-e)/N)
     return [e, de]
 
-def load_data(filename):
+def load_data(filename,stop=None):
     """
     Returns a pandas dataframe of the skimmed data in `filename`. Caches the
     result in a local .cache directory so that subsequent calls are fast.
     """
     import hashlib
     mtime = os.path.getmtime(filename)
-    sha1 = hashlib.sha1(abspath(filename) + str(mtime)).encode("utf-8").hexdigest()
+    sha1 = hashlib.sha1(abspath(filename) + str(mtime) + str(stop)).encode("utf-8").hexdigest()
     key = "%s.pickle" % sha1
     filepath = join(expanduser("~"),".cache","combine",key)
     if exists(filepath):
         with open(filepath,"b") as f:
             return pickle.load(f)
-    ds = pd.DataFrame(rtnp.root2array(filename))
+    ds = pd.DataFrame(rtnp.root2array(filename,stop=stop))
     with open(filepath,"b") as f:
         pickle.dump(ds,f)
     return ds
