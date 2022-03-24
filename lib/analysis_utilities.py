@@ -140,11 +140,11 @@ def load_data(filename,stop=None):
         os.makedirs(dirname)
     if exists(filepath):
         try:
-            return pd.from_hdf(filepath,'df')
+            return pd.read_hdf(filepath,'df')
         except EOFError:
             pass
     ds = pd.DataFrame(rtnp.root2array(filename,stop=stop))
-    ds.to_hdf(filepath,'df')
+    ds.to_hdf(filepath,'df',mode='w')
     return ds
 
 class DSetLoader(object):
