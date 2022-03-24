@@ -6,6 +6,7 @@ import pandas as pd
 from glob import glob
 import yaml
 import os
+from os.path import join, expanduser, exists, abspath
 
 import operator
 ops = {'>': operator.gt, '<': operator.lt, }
@@ -123,13 +124,17 @@ def getEff(k,N):
     de = np.sqrt(e*(1-e)/N)
     return [e, de]
 
-def memoize_data(f):
-    def fun(*args, **kwargs):
-        
 def load_data(filename):
-    key = "%s%s.pickle" % (filename,str(os.path.getmtime(filename)))
-    filepath = os.path.join(os.path.expanduser("~"),key)
-    if os.path.exists(filepath):
+    """
+    Returns a pandas dataframe of the skimmed data in `filename`. Caches the
+    result in a local .cache directory so that subsequent calls are fast.
+    """
+    import hashlib
+    mtime = os.path.getmtime(filename)
+    sha1 = hashlib.sha1(abspath(filename) + str(mtime)).encode("utf-8").hexdigest()
+    key = "%s.pickle" % sha1
+    filepath = join(expanduser("~"),".cache","combine",key)
+    if exists(filepath):
         with open(filepath,"b") as f:
             return pickle.load(f)
     ds = pd.DataFrame(rtnp.root2array(filename))
