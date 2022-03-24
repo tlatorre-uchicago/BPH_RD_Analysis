@@ -7,6 +7,7 @@ from glob import glob
 import yaml
 import os
 from os.path import join, expanduser, exists, abspath
+import pickle
 
 import operator
 ops = {'>': operator.gt, '<': operator.lt, }
@@ -131,14 +132,20 @@ def load_data(filename,stop=None):
     """
     import hashlib
     mtime = os.path.getmtime(filename)
-    sha1 = hashlib.sha1(abspath(filename) + str(mtime) + str(stop)).encode("utf-8").hexdigest()
+    sha1 = hashlib.sha1(abspath(filename) + str(mtime) + str(stop)).hexdigest()
     key = "%s.pickle" % sha1
     filepath = join(expanduser("~"),".cache","combine",key)
+    dirname = os.path.dirname(filepath)
+    if not exists(dirname):
+        os.makedirs(dirname)
     if exists(filepath):
-        with open(filepath,"b") as f:
-            return pickle.load(f)
+        try:
+            with open(filepath,"rb") as f:
+                return pickle.load(f)
+        except EOFError:
+            pass
     ds = pd.DataFrame(rtnp.root2array(filename,stop=stop))
-    with open(filepath,"b") as f:
+    with open(filepath,"wb") as f:
         pickle.dump(ds,f)
     return ds
 
