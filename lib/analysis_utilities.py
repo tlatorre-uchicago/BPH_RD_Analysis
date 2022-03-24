@@ -133,20 +133,18 @@ def load_data(filename,stop=None):
     import hashlib
     mtime = os.path.getmtime(filename)
     sha1 = hashlib.sha1(abspath(filename) + str(mtime) + str(stop)).hexdigest()
-    key = "%s.pickle" % sha1
+    key = "%s.hdf5" % sha1
     filepath = join(expanduser("~"),".cache","combine",key)
     dirname = os.path.dirname(filepath)
     if not exists(dirname):
         os.makedirs(dirname)
     if exists(filepath):
         try:
-            with open(filepath,"rb") as f:
-                return pickle.load(f)
+            return pd.from_hdf(filepath,'df')
         except EOFError:
             pass
     ds = pd.DataFrame(rtnp.root2array(filename,stop=stop))
-    with open(filepath,"wb") as f:
-        pickle.dump(ds,f)
+    ds.to_hdf(filepath,'df')
     return ds
 
 class DSetLoader(object):
