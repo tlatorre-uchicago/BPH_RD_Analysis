@@ -579,8 +579,8 @@ def loadDatasets(category, loadRD):
         ['K_lostInnerHits', -2, 1],
         ['pi_lostInnerHits', -2, 1],
         ['pis_lostInnerHits', -2, 1],
-        # ['ctrl_tk_pval_0', 0.2, 1.0],
-        # ['ctrl_tk_pval_1', 0.2, 1.0],
+        #['ctrl_pm_tk_pval_0', 0.2, 1.0],
+        ['ctrl_pm_tk_pval_1', 0.2, 1.0],
         # ['ctrl_pm_massVisTks', 0, 3.8],
         # ['ctrl_pm_massHadTks', 2.6, 10],
         # ['ctrl_pm_index', 3, 0],
@@ -721,9 +721,15 @@ def computeRandomTracksWeights(ds, relScale=0.1, centralVal=1., kind=None):
         print 'Kind', kind, 'not recognized'
         raise
     exponent = selPdgID0.astype(np.int) + selPdgID1.astype(np.int)
-    w = np.power(centralVal, exponent)
-    up = np.power(centralVal*(1+relScale), exponent)/w
-    down = np.power(centralVal*max(0, 1-relScale), exponent)/w
+    w1 = np.power(centralVal, exponent)
+    up1 = np.power(centralVal*(1+relScale), exponent)
+    down1 = np.power(centralVal*max(0, 1-relScale), exponent)
+    w2 = np.power(centralVal*2, exponent)
+    up2 = np.power(centralVal*2*(1+relScale), exponent)
+    down2 = np.power(centralVal*2*max(0, 1-relScale), exponent)
+    w = np.where(exponent <= 1, w1, w2)
+    up = np.where(exponent <= 1, up1, up2)/w
+    down = np.where(exponent <= 1, down1, down2)/w
     return w, up, down
 
 def createHistograms(category):
@@ -1285,7 +1291,7 @@ def createHistograms(category):
         print 'Computing total weights'
         weightsCentral = np.ones_like(ds['q2'])
         for wName, w in weights.iteritems():
-            if np.max(np.abs(w)) > 3:
+            if len(w) > 0 and np.max(np.abs(w)) > 3:
                 iMax = np.argmax(np.abs(w))
                 print '[WARNING] Max weights', wName, ': {:.3}'.format(w[iMax])
             weightsCentral *= w
@@ -1330,7 +1336,10 @@ def createHistograms(category):
                     if not name_wVar == '':
                         h_name += '__' + name_wVar
                     w = weightsCentral*v_wVar
-                    scale = nTotExp/nTotSelected
+                    if nTotSelected == 0:
+                        scale = 1
+                    else:
+                        scale = nTotExp/nTotSelected
                     histo[cat_name][h_name] = create_TH1D(
                                                           ds[var][sel_q2],
                                                           name=h_name, title=h_name,
@@ -1356,7 +1365,10 @@ def createHistograms(category):
                 if not name_wVar == '':
                     h_name += '__' + name_wVar
                 w = weightsCentral*v_wVar
-                scale = nTotExp/nTotSelected
+                if nTotSelected == 0:
+                    scale = 1
+                else:
+                    scale = nTotExp/nTotSelected
                 varName = var
                 if var == 'specQ2':
                     varName = 'q2'
@@ -2715,8 +2727,8 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
     card += 'overallMcNorm'+category.trg+' rateParam * B[usd]_* 1.\n'
 
     # Relax control regions norm
-    card += 'ctrlNormBToDstHc'+category.trg+' rateParam ctrl_??_* B[dsu]_D* 1.\n'
-    card += 'ctrlNormBToDstPiPi'+category.trg+' rateParam ctrl_??_* B[dsu]_*PiPi 1.\n'
+    #card += 'ctrlNormBToDstHc'+category.trg+' rateParam ctrl_??_* B[dsu]_D* 1.\n'
+    #card += 'ctrlNormBToDstPiPi'+category.trg+' rateParam ctrl_??_* B[dsu]_*PiPi 1.\n'
 
 
     #### Combinatorial background norm

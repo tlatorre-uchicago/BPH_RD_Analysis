@@ -519,6 +519,8 @@ def makeSelection(inputs):
 
     output = np.zeros((int(1.5*(stop-start+1)), len(leafs_names)))
 
+    print("output shape = ", output.shape)
+
     for i_ev in range(start,stop):
         bytesRead = tree.GetEntry(i_ev, 1)
         if bytesRead == 0:
@@ -642,6 +644,7 @@ def makeSelection(inputs):
                         ev.MC_q2, ev.MC_Est_mu, ev.MC_M2_miss,
                         ev.MC_B_pt, ev.MC_B_eta, ev.MC_B_phi, ev.MC_B_ctau,
                         ev.MC_Dst_pt, ev.MC_Dst_eta, ev.MC_Dst_phi,
+                        ev.MC_mu_cloasestMCpart_pdgId[0],
                         ev.MC_mu_pt, ev.MC_mu_eta, ev.MC_mu_phi,
                         ev.MC_mu_TransvIP_PV, ev.MC_mu_TransvIP_vtxDst, ev.MC_mu_IP_vtxDst,
                         ev.MC_pi_pt, ev.MC_pi_eta, ev.MC_pi_phi,
@@ -1094,6 +1097,7 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
                             'MC_q2', 'MC_Est_mu', 'MC_M2_miss',
                             'MC_B_pt', 'MC_B_eta', 'MC_B_phi', 'MC_B_ctau',
                             'MC_Dst_pt', 'MC_Dst_eta', 'MC_Dst_phi',
+                            'MC_mu_cloasestMCpart_pdgId',
                             'MC_mu_pt', 'MC_mu_eta', 'MC_mu_phi',
                             'MC_mu_TransvIP_PV', 'MC_mu_TransvIP_vtxDst', 'MC_mu_IP_vtxDst',
                             'MC_pi_pt', 'MC_pi_eta', 'MC_pi_phi',

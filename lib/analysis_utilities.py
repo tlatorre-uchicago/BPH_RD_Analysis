@@ -123,6 +123,20 @@ def getEff(k,N):
     de = np.sqrt(e*(1-e)/N)
     return [e, de]
 
+def memoize_data(f):
+    def fun(*args, **kwargs):
+        
+def load_data(filename):
+    key = "%s%s.pickle" % (filename,str(os.path.getmtime(filename)))
+    filepath = os.path.join(os.path.expanduser("~"),key)
+    if os.path.exists(filepath):
+        with open(filepath,"b") as f:
+            return pickle.load(f)
+    ds = pd.DataFrame(rtnp.root2array(filename))
+    with open(filepath,"b") as f:
+        pickle.dump(ds,f)
+    return ds
+
 class DSetLoader(object):
     def __init__(self, in_sample,
                  # candLoc='/storage/af/user/ocerri/BPhysics/data/cmsMC_private/',
@@ -183,7 +197,7 @@ class DSetLoader(object):
         loc = self.skimmed_dir + '/{}_{}.root'.format(catName, tag)
         if not hasattr(self, 'data'):
             self.data = {}
-        self.data['{}_{}'.format(catName, tag)] = pd.DataFrame(rtnp.root2array(loc))
+        self.data['{}_{}'.format(catName, tag)] = load_data(loc)
         return
 
     def getSkimEff(self, catName='probe'):
