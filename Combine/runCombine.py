@@ -483,7 +483,7 @@ def loadDatasets(category, loadRD):
 
     for n, s in MCsample.iteritems():
         if not n in processOrder:
-            print n, 'not declarted in processOrder'
+            print n, 'not declared in processOrder'
             raise
 
         branches_to_load = relevantBranches['all'] + relevantBranches['mc']
@@ -1201,8 +1201,18 @@ def createHistograms(category):
                 weights[name], wVar[name+'Up'], wVar[name+'Down'] = wc, wu, wd
 
         if n == 'B_DstDXX':
-            nnn = 'Bu_DstDXX_frac'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bu_DstDXX_Kplusfrac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521, 'MC_StrangeDstSisPdgId': 321}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bu_DstDXX_K0frac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521, 'MC_StrangeDstSisPdgId': 311}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bu_DstDXX_rhofrac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521, 'MC_StrangeDstSisPdgId': 0}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bd_DstDXX_Kplusfrac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 511, 'MC_StrangeDstSisPdgId': 321}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bd_DstDXX_D0frac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 511, 'MC_StrangeDstSisPdgId': 0, 'MC_CharmedDstSisPdgId': 421}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bd_DstDXX_Dplusfrac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 511, 'MC_StrangeDstSisPdgId': 0, 'MC_CharmedDstSisPdgId': 411}, relScale=0.5, centralVal=2., keepNorm=True)
 
 
         ############################
@@ -1673,8 +1683,18 @@ def createHistograms(category):
                 weights[name], wVar[name+'Up'], wVar[name+'Down'] = wc, wu, wd
 
         if n == 'B_DstDXX':
-            nnn = 'Bu_DstDXX_frac'
-            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bu_DstDXX_Kplusfrac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521, 'MC_StrangeDstSisPdgId': 321}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bu_DstDXX_K0frac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521, 'MC_StrangeDstSisPdgId': 311}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bu_DstDXX_rhofrac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 521, 'MC_StrangeDstSisPdgId': 0}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bd_DstDXX_Kplusfrac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 511, 'MC_StrangeDstSisPdgId': 321}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bd_DstDXX_D0frac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 511, 'MC_StrangeDstSisPdgId': 0, 'MC_CharmedDstSisPdgId': 421}, relScale=0.5, centralVal=2., keepNorm=True)
+            nnn = 'Bd_DstDXX_Dplusfrac'
+            weights[nnn], wVar[nnn+'Up'], wVar[nnn+'Down'] = computeBrVarWeights(ds, {'MC_DstMotherPdgId': 511, 'MC_StrangeDstSisPdgId': 0, 'MC_CharmedDstSisPdgId': 411}, relScale=0.5, centralVal=2., keepNorm=True)
 
 
         ############################
@@ -2827,7 +2847,9 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
                 shapeNames.append('br'+nnn+'_'+str(proc_id))
         card += brShapeSys([nnn], shapeNames)
 
-    card += brShapeSys(['B_DstDXX'], ['Bu_DstDXX_frac'])
+    for nnn in ['Bu_DstDXX_Kplusfrac', 'Bu_DstDXX_K0frac', 'Bu_DstDXX_rhofrac', 'Bd_DstDXX_Kplusfrac', 'Bd_DstDXX_D0frac', 'Bd_DstDXX_Dplusfrac']:
+        card += brShapeSys(['B_DstDXX'], [nnn])
+
 
 
 
