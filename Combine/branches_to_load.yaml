@@ -59,6 +59,8 @@ mc:
  - MC_mu_pt
  - MC_mu_eta
  - MC_MassCharmedBDaughter
+ - MC_StrangeDstSisPdgId
+ - MC_CharmedDstSisPdgId
  - MC_DstMotherPdgId
  - MC_tkFlag_0
  - MC_tkFlag_1
