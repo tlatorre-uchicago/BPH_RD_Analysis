@@ -765,46 +765,39 @@ def createHistograms(category):
     fTriggerSF = rt.TFile.Open(loc + 'HLT_' + category.trg + '_SF_v22_count.root', 'READ')
     hTriggerSF = fTriggerSF.Get('hSF_HLT_' + category.trg)
     def computeTrgSF(ds, hSF, selection=None):
-        trgSF = np.ones_like(ds['q2'])
-        trgSFUnc = np.zeros_like(ds['q2'])
         ptmax = hSF.GetXaxis().GetXmax() - 0.01
         ipmax = hSF.GetYaxis().GetXmax() - 0.01
         etamax = hSF.GetZaxis().GetXmax() - 0.01
         x = np.column_stack((ds['mu_pt'], ds['mu_eta'], ds['mu_sigdxy']))
-        weights = {}
-        weights_up = {}
-        weights_down = {}
+        w = {}
+        up = {}
+        down = {}
         if not selection is None:
             x = x[selection]
         for i, (pt, eta, ip) in enumerate(x):
             ix = hSF.GetXaxis().FindBin(min(ptmax, pt))
             iy = hSF.GetYaxis().FindBin(min(ipmax, ip))
             iz = hSF.GetZaxis().FindBin(min(etamax, np.abs(eta)))
-            name = 'trgSF_%i_%i_%i' % (ix,iy,iz)
-            if name not in weights:
-                weights[name] = np.ones_like(ds['mu_pt'])
-                weights_up[name] = np.ones_like(ds['mu_pt'])
-                weights_down[name] = np.ones_like(ds['mu_pt'])
+            name = '%i_%i_%i' % (ix,iy,iz)
+            if name not in w:
+                w[name] = np.ones_like(ds['mu_pt'])
+                up[name] = np.ones_like(ds['mu_pt'])
+                down[name] = np.ones_like(ds['mu_pt'])
             trgSF[i] = hSF.GetBinContent(ix, iy, iz)
             ib = hSF.GetBin(ix, iy, iz)
             trgSFUnc[i] = hSF.GetBinError(ib)
-            weights[name][i] *= trgSF[i]
-            weights_up[name][i] *= trgSF[i] + trgSFUnc[i]
-            weights_down[name][i] *= trgSF[i] - trgSFUnc[i]
+            w[name][i] *= trgSF[i]
+            up[name][i] *= trgSF[i] + trgSFUnc[i]
+            down[name][i] *= trgSF[i] - trgSFUnc[i]
             if trgSF[i] == 0:
                 print pt, ip, np.abs(eta)
                 raise
 
-        for name in weights:
-            weights_up[name] /= weights[name]
-            weights_down[name] /= weights[name]
+        for name in w:
+            up[name] /= w[name]
+            down[name] /= w[name]
 
-        return weights, weights_up, weights_down
-
-        # Divide them for the weight so later you can simply multiply back to get the value
-        up = 1 + trgSFUnc/trgSF
-        down = 1 - trgSFUnc/trgSF
-        return trgSF, up, down
+        return w, up, down
 
     fMuonIDSF = rt.TFile.Open(dataDir+'/calibration/muonIDscaleFactors/Run2018ABCD_SF_MuonID_Jpsi.root', 'READ')
     hMuonIDSF = fMuonIDSF.Get('NUM_MediumID_DEN_genTracks_pt_abseta')
@@ -1047,39 +1040,11 @@ def createHistograms(category):
 
             print 'Including trigger corrections'
             nameSF = 'trg{}SF'.format(category.trg)
-            #weights[nameSF], wSfUp, wSfDw = computeTrgSF(ds, hTriggerSF)
             w, up, down = computeTrgSF(ds, hTriggerSF)
             for name in w:
-                weights[nameSF + name] = w[name]
-                wVar[nameSF + name+'Up'] = up[name]
-                wVar[nameSF + name+'Down'] = down[name]
-            #auxOnes = np.ones_like(wSfUp)
-            ## for i_eta in range(1, hTriggerSF.GetNbinsZ()+1):
-            ##     c_eta = hTriggerSF.GetZaxis().GetBinCenter(i_eta)
-            ##     w_eta = hTriggerSF.GetZaxis().GetBinWidth(i_eta)
-            ## for i_ip in range(1, hTriggerSF.GetNbinsY()+1):
-            ##     c_ip = hTriggerSF.GetYaxis().GetBinCenter(i_ip)
-            ##     w_ip = hTriggerSF.GetYaxis().GetBinWidth(i_ip)
-            ##     if c_ip + 0.5*w_ip <= category.minIP:
-            ##         continue
-            #for i_pt in range(1, hTriggerSF.GetNbinsX()+2):
-            #    if i_pt > hTriggerSF.GetNbinsX() and category.name == 'High':
-            #        sel = ds['mu_pt'] > hTriggerSF.GetXaxis().GetXmax()
-            #    else:
-            #        c_pt = hTriggerSF.GetXaxis().GetBinCenter(i_pt)
-            #        w_pt = hTriggerSF.GetXaxis().GetBinWidth(i_pt)
-            #        if (c_pt + 0.5*w_pt <= category.min_pt) or (c_pt - 0.5*w_pt >= category.max_pt):
-            #            continue
-
-            #        sel = np.abs(ds['mu_pt'] - c_pt) < w_pt
-            #    # sel = np.logical_and(sel, np.abs(ds['mu_sigdxy'] - c_ip) < w_ip)
-            #    # sel = np.logical_and(sel, np.abs(ds['mu_eta'] - c_eta) < w_eta)
-            #    # binName = '_pt{}ip{}eta{}'.format(i_pt, i_ip, i_eta)
-            #    # print 'Trg SF', i_pt, i_ip, i_eta, '-> selected {}'.format(np.sum(sel))
-            #    # binName = '_pt{}ip{}'.format(i_pt, i_ip)
-            #    binName = '_pt{}'.format(i_pt)
-            #    wVar[nameSF+binName+'Up'] = np.where(sel, wSfUp, auxOnes)
-            #    wVar[nameSF+binName+'Down'] = np.where(sel, wSfDw, auxOnes)
+                weights["%s_%s" % (nameSF,name)] = w[name]
+                wVar["%s_%s_%s" % (nameSF,name,'Up')] = up[name]
+                wVar["%s_%s_%s" % (nameSF,name,'Down')] = down[name]
 
             print 'Including muon ID corrections'
             weights['muonIdSF'], _, _ = computeMuonIDSF(ds)
@@ -1509,38 +1474,11 @@ def createHistograms(category):
 
             print 'Including trigger corrections'
             nameSF = 'trg{}SF'.format(category.trg)
-            #weights[nameSF], wSfUp, wSfDw = computeTrgSF(ds, hTriggerSF)
             w, up, down = computeTrgSF(ds, hTriggerSF)
             for name in w:
-                weights[nameSF + name] = w[name]
-                wVar[nameSF + name+'Up'] = up[name]
-                wVar[nameSF + name+'Down'] = down[name]
-            # for i_eta in range(1, hTriggerSF.GetNbinsZ()+1):
-            #     c_eta = hTriggerSF.GetZaxis().GetBinCenter(i_eta)
-            #     w_eta = hTriggerSF.GetZaxis().GetBinWidth(i_eta)
-            # for i_ip in range(1, hTriggerSF.GetNbinsY()+1):
-            #     c_ip = hTriggerSF.GetYaxis().GetBinCenter(i_ip)
-            #     w_ip = hTriggerSF.GetYaxis().GetBinWidth(i_ip)
-            #     if c_ip + 0.5*w_ip <= category.minIP:
-            #         continue
-            #for i_pt in range(1, hTriggerSF.GetNbinsX()+2):
-            #    if i_pt > hTriggerSF.GetNbinsX() and category.name == 'High':
-            #        sel = ds['mu_pt'] > hTriggerSF.GetXaxis().GetXmax()
-            #    else:
-            #        c_pt = hTriggerSF.GetXaxis().GetBinCenter(i_pt)
-            #        w_pt = hTriggerSF.GetXaxis().GetBinWidth(i_pt)
-            #        if (c_pt + 0.5*w_pt <= category.min_pt) or (c_pt - 0.5*w_pt >= category.max_pt):
-            #            continue
-
-            #        sel = np.abs(ds['mu_pt'] - c_pt) < w_pt
-            #    # sel = np.logical_and(sel, np.abs(ds['mu_sigdxy'] - c_ip) < w_ip)
-            #    # sel = np.logical_and(sel, np.abs(ds['mu_eta'] - c_eta) < w_eta)
-            #    # binName = '_pt{}ip{}eta{}'.format(i_pt, i_ip, i_eta)
-            #    # print 'Trg SF', i_pt, i_ip, i_eta, '-> selected {}'.format(np.sum(sel))
-            #    # binName = '_pt{}ip{}'.format(i_pt, i_ip)
-            #    binName = '_pt{}'.format(i_pt)
-            #    wVar[nameSF+binName+'Up'] = np.where(sel, wSfUp, auxOnes)
-            #    wVar[nameSF+binName+'Down'] = np.where(sel, wSfDw, auxOnes)
+                weights["%s_%s" % (nameSF,name)] = w[name]
+                wVar["%s_%s_%s" % (nameSF,name,'Up')] = up[name]
+                wVar["%s_%s_%s" % (nameSF,name,'Down')] = down[name]
 
             print 'Including muon ID corrections'
             weights['muonIdSF'], _, _ = computeMuonIDSF(ds)
