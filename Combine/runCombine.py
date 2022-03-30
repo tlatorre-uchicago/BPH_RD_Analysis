@@ -774,22 +774,25 @@ def createHistograms(category):
         down = {}
         if not selection is None:
             x = x[selection]
+        for ix in range(hSF.GetNbinsX()+1):
+            for iy in range(hSF.GetNbinsY()+1):
+                for iz in range(hSF.GetNbinsZ()+1):
+                    name = '%i_%i_%i' % (ix,iy,iz)
+                    w[name] = np.ones_like(ds['mu_pt'])
+                    up[name] = np.ones_like(ds['mu_pt'])
+                    down[name] = np.ones_like(ds['mu_pt'])
         for i, (pt, eta, ip) in enumerate(x):
             ix = hSF.GetXaxis().FindBin(min(ptmax, pt))
             iy = hSF.GetYaxis().FindBin(min(ipmax, ip))
             iz = hSF.GetZaxis().FindBin(min(etamax, np.abs(eta)))
             name = '%i_%i_%i' % (ix,iy,iz)
-            if name not in w:
-                w[name] = np.ones_like(ds['mu_pt'])
-                up[name] = np.ones_like(ds['mu_pt'])
-                down[name] = np.ones_like(ds['mu_pt'])
-            trgSF[i] = hSF.GetBinContent(ix, iy, iz)
+            trgSF = hSF.GetBinContent(ix, iy, iz)
             ib = hSF.GetBin(ix, iy, iz)
-            trgSFUnc[i] = hSF.GetBinError(ib)
-            w[name][i] *= trgSF[i]
-            up[name][i] *= trgSF[i] + trgSFUnc[i]
-            down[name][i] *= trgSF[i] - trgSFUnc[i]
-            if trgSF[i] == 0:
+            trgSFUnc = hSF.GetBinError(ib)
+            w[name][i] *= trgSF
+            up[name][i] *= trgSF + trgSFUnc
+            down[name][i] *= trgSF - trgSFUnc
+            if trgSF == 0:
                 print pt, ip, np.abs(eta)
                 raise
 
