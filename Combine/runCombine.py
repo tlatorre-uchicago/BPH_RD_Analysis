@@ -577,9 +577,9 @@ def loadDatasets(category, loadRD):
             addCuts = [ ['M2_miss', 0.4, 1e3], ['mu_eta', -0.8, 0.8] ]
         else:
             addCuts = [ ['M2_miss', -0.2, 1e3] ]
-        ['mu_eta', -0.8, 0.8],
         addCuts += [
-        ['mu_pt', 0, 20],
+        ['mu_pt', 14, 20],
+        ['mu_sigdxy', 8, 200],
         # ['B_eta', -1., 1.],
         # ['pis_pt', 1., 1e3],
         ['mu_db_iso04', 0, 80],
@@ -771,18 +771,35 @@ def createHistograms(category):
         ipmax = hSF.GetYaxis().GetXmax() - 0.01
         etamax = hSF.GetZaxis().GetXmax() - 0.01
         x = np.column_stack((ds['mu_pt'], ds['mu_eta'], ds['mu_sigdxy']))
+        weights = {}
+        weights_up = {}
+        weights_down = {}
         if not selection is None:
             x = x[selection]
         for i, (pt, eta, ip) in enumerate(x):
             ix = hSF.GetXaxis().FindBin(min(ptmax, pt))
             iy = hSF.GetYaxis().FindBin(min(ipmax, ip))
             iz = hSF.GetZaxis().FindBin(min(etamax, np.abs(eta)))
+            name = 'trgSF_%i_%i_%i' % (ix,iy,iz)
+            if name not in weights:
+                weights[name] = np.ones_like(ds['mu_pt'])
+                weights_up[name] = np.ones_like(ds['mu_pt'])
+                weights_down[name] = np.ones_like(ds['mu_pt'])
             trgSF[i] = hSF.GetBinContent(ix, iy, iz)
             ib = hSF.GetBin(ix, iy, iz)
             trgSFUnc[i] = hSF.GetBinError(ib)
+            weights[name][i] *= trgSF[i]
+            weights_up[name][i] *= trgSF[i] + trgSFUnc[i]
+            weights_down[name][i] *= trgSF[i] - trgSFUnc[i]
             if trgSF[i] == 0:
                 print pt, ip, np.abs(eta)
                 raise
+
+        for name in weights:
+            weights_up[name] /= weights[name]
+            weights_down[name] /= weights[name]
+
+        return weights, weights_up, weights_down
 
         # Divide them for the weight so later you can simply multiply back to get the value
         up = 1 + trgSFUnc/trgSF
@@ -1030,34 +1047,39 @@ def createHistograms(category):
 
             print 'Including trigger corrections'
             nameSF = 'trg{}SF'.format(category.trg)
-            weights[nameSF], wSfUp, wSfDw = computeTrgSF(ds, hTriggerSF)
-            auxOnes = np.ones_like(wSfUp)
-            # for i_eta in range(1, hTriggerSF.GetNbinsZ()+1):
-            #     c_eta = hTriggerSF.GetZaxis().GetBinCenter(i_eta)
-            #     w_eta = hTriggerSF.GetZaxis().GetBinWidth(i_eta)
-            # for i_ip in range(1, hTriggerSF.GetNbinsY()+1):
-            #     c_ip = hTriggerSF.GetYaxis().GetBinCenter(i_ip)
-            #     w_ip = hTriggerSF.GetYaxis().GetBinWidth(i_ip)
-            #     if c_ip + 0.5*w_ip <= category.minIP:
-            #         continue
-            for i_pt in range(1, hTriggerSF.GetNbinsX()+2):
-                if i_pt > hTriggerSF.GetNbinsX() and category.name == 'High':
-                    sel = ds['mu_pt'] > hTriggerSF.GetXaxis().GetXmax()
-                else:
-                    c_pt = hTriggerSF.GetXaxis().GetBinCenter(i_pt)
-                    w_pt = hTriggerSF.GetXaxis().GetBinWidth(i_pt)
-                    if (c_pt + 0.5*w_pt <= category.min_pt) or (c_pt - 0.5*w_pt >= category.max_pt):
-                        continue
+            #weights[nameSF], wSfUp, wSfDw = computeTrgSF(ds, hTriggerSF)
+            w, up, down = computeTrgSF(ds, hTriggerSF)
+            for name in w:
+                weights[nameSF + name] = w[name]
+                wVar[nameSF + name+'Up'] = up[name]
+                wVar[nameSF + name+'Down'] = down[name]
+            #auxOnes = np.ones_like(wSfUp)
+            ## for i_eta in range(1, hTriggerSF.GetNbinsZ()+1):
+            ##     c_eta = hTriggerSF.GetZaxis().GetBinCenter(i_eta)
+            ##     w_eta = hTriggerSF.GetZaxis().GetBinWidth(i_eta)
+            ## for i_ip in range(1, hTriggerSF.GetNbinsY()+1):
+            ##     c_ip = hTriggerSF.GetYaxis().GetBinCenter(i_ip)
+            ##     w_ip = hTriggerSF.GetYaxis().GetBinWidth(i_ip)
+            ##     if c_ip + 0.5*w_ip <= category.minIP:
+            ##         continue
+            #for i_pt in range(1, hTriggerSF.GetNbinsX()+2):
+            #    if i_pt > hTriggerSF.GetNbinsX() and category.name == 'High':
+            #        sel = ds['mu_pt'] > hTriggerSF.GetXaxis().GetXmax()
+            #    else:
+            #        c_pt = hTriggerSF.GetXaxis().GetBinCenter(i_pt)
+            #        w_pt = hTriggerSF.GetXaxis().GetBinWidth(i_pt)
+            #        if (c_pt + 0.5*w_pt <= category.min_pt) or (c_pt - 0.5*w_pt >= category.max_pt):
+            #            continue
 
-                    sel = np.abs(ds['mu_pt'] - c_pt) < w_pt
-                # sel = np.logical_and(sel, np.abs(ds['mu_sigdxy'] - c_ip) < w_ip)
-                # sel = np.logical_and(sel, np.abs(ds['mu_eta'] - c_eta) < w_eta)
-                # binName = '_pt{}ip{}eta{}'.format(i_pt, i_ip, i_eta)
-                # print 'Trg SF', i_pt, i_ip, i_eta, '-> selected {}'.format(np.sum(sel))
-                # binName = '_pt{}ip{}'.format(i_pt, i_ip)
-                binName = '_pt{}'.format(i_pt)
-                wVar[nameSF+binName+'Up'] = np.where(sel, wSfUp, auxOnes)
-                wVar[nameSF+binName+'Down'] = np.where(sel, wSfDw, auxOnes)
+            #        sel = np.abs(ds['mu_pt'] - c_pt) < w_pt
+            #    # sel = np.logical_and(sel, np.abs(ds['mu_sigdxy'] - c_ip) < w_ip)
+            #    # sel = np.logical_and(sel, np.abs(ds['mu_eta'] - c_eta) < w_eta)
+            #    # binName = '_pt{}ip{}eta{}'.format(i_pt, i_ip, i_eta)
+            #    # print 'Trg SF', i_pt, i_ip, i_eta, '-> selected {}'.format(np.sum(sel))
+            #    # binName = '_pt{}ip{}'.format(i_pt, i_ip)
+            #    binName = '_pt{}'.format(i_pt)
+            #    wVar[nameSF+binName+'Up'] = np.where(sel, wSfUp, auxOnes)
+            #    wVar[nameSF+binName+'Down'] = np.where(sel, wSfDw, auxOnes)
 
             print 'Including muon ID corrections'
             weights['muonIdSF'], _, _ = computeMuonIDSF(ds)
@@ -1487,8 +1509,12 @@ def createHistograms(category):
 
             print 'Including trigger corrections'
             nameSF = 'trg{}SF'.format(category.trg)
-            weights[nameSF], wSfUp, wSfDw = computeTrgSF(ds, hTriggerSF)
-            auxOnes = np.ones_like(wSfUp)
+            #weights[nameSF], wSfUp, wSfDw = computeTrgSF(ds, hTriggerSF)
+            w, up, down = computeTrgSF(ds, hTriggerSF)
+            for name in w:
+                weights[nameSF + name] = w[name]
+                wVar[nameSF + name+'Up'] = up[name]
+                wVar[nameSF + name+'Down'] = down[name]
             # for i_eta in range(1, hTriggerSF.GetNbinsZ()+1):
             #     c_eta = hTriggerSF.GetZaxis().GetBinCenter(i_eta)
             #     w_eta = hTriggerSF.GetZaxis().GetBinWidth(i_eta)
@@ -1497,24 +1523,24 @@ def createHistograms(category):
             #     w_ip = hTriggerSF.GetYaxis().GetBinWidth(i_ip)
             #     if c_ip + 0.5*w_ip <= category.minIP:
             #         continue
-            for i_pt in range(1, hTriggerSF.GetNbinsX()+2):
-                if i_pt > hTriggerSF.GetNbinsX() and category.name == 'High':
-                    sel = ds['mu_pt'] > hTriggerSF.GetXaxis().GetXmax()
-                else:
-                    c_pt = hTriggerSF.GetXaxis().GetBinCenter(i_pt)
-                    w_pt = hTriggerSF.GetXaxis().GetBinWidth(i_pt)
-                    if (c_pt + 0.5*w_pt <= category.min_pt) or (c_pt - 0.5*w_pt >= category.max_pt):
-                        continue
+            #for i_pt in range(1, hTriggerSF.GetNbinsX()+2):
+            #    if i_pt > hTriggerSF.GetNbinsX() and category.name == 'High':
+            #        sel = ds['mu_pt'] > hTriggerSF.GetXaxis().GetXmax()
+            #    else:
+            #        c_pt = hTriggerSF.GetXaxis().GetBinCenter(i_pt)
+            #        w_pt = hTriggerSF.GetXaxis().GetBinWidth(i_pt)
+            #        if (c_pt + 0.5*w_pt <= category.min_pt) or (c_pt - 0.5*w_pt >= category.max_pt):
+            #            continue
 
-                    sel = np.abs(ds['mu_pt'] - c_pt) < w_pt
-                # sel = np.logical_and(sel, np.abs(ds['mu_sigdxy'] - c_ip) < w_ip)
-                # sel = np.logical_and(sel, np.abs(ds['mu_eta'] - c_eta) < w_eta)
-                # binName = '_pt{}ip{}eta{}'.format(i_pt, i_ip, i_eta)
-                # print 'Trg SF', i_pt, i_ip, i_eta, '-> selected {}'.format(np.sum(sel))
-                # binName = '_pt{}ip{}'.format(i_pt, i_ip)
-                binName = '_pt{}'.format(i_pt)
-                wVar[nameSF+binName+'Up'] = np.where(sel, wSfUp, auxOnes)
-                wVar[nameSF+binName+'Down'] = np.where(sel, wSfDw, auxOnes)
+            #        sel = np.abs(ds['mu_pt'] - c_pt) < w_pt
+            #    # sel = np.logical_and(sel, np.abs(ds['mu_sigdxy'] - c_ip) < w_ip)
+            #    # sel = np.logical_and(sel, np.abs(ds['mu_eta'] - c_eta) < w_eta)
+            #    # binName = '_pt{}ip{}eta{}'.format(i_pt, i_ip, i_eta)
+            #    # print 'Trg SF', i_pt, i_ip, i_eta, '-> selected {}'.format(np.sum(sel))
+            #    # binName = '_pt{}ip{}'.format(i_pt, i_ip)
+            #    binName = '_pt{}'.format(i_pt)
+            #    wVar[nameSF+binName+'Up'] = np.where(sel, wSfUp, auxOnes)
+            #    wVar[nameSF+binName+'Down'] = np.where(sel, wSfDw, auxOnes)
 
             print 'Including muon ID corrections'
             weights['muonIdSF'], _, _ = computeMuonIDSF(ds)
@@ -2713,7 +2739,7 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
     nameSF = 'trg{}SF'.format(category.trg)
     counter = 0
     for k in histo.values()[0].keys():
-        if k.startswith(processOrder[0]+'__'+nameSF + '_pt') and k.endswith('Up'):
+        if k.startswith(processOrder[0]+'__'+nameSF) and k.endswith('Up'):
             n = k[k.find('__')+2:-2]
             card += n+' shape' + mcProcStr*nCat + '\n'
             counter += 1
