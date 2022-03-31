@@ -578,8 +578,8 @@ def loadDatasets(category, loadRD):
         else:
             addCuts = [ ['M2_miss', -0.2, 1e3] ]
         addCuts += [
-        ['mu_pt', 14, 20],
-        ['mu_sigdxy', 8, 200],
+        ['mu_pt', 0, 20],
+        #['mu_sigdxy', 8, 200],
         # ['B_eta', -1., 1.],
         # ['pis_pt', 1., 1e3],
         ['mu_db_iso04', 0, 80],
@@ -774,9 +774,9 @@ def createHistograms(category):
         down = {}
         if not selection is None:
             x = x[selection]
-        for ix in range(hSF.GetNbinsX()+1):
-            for iy in range(hSF.GetNbinsY()+1):
-                for iz in range(hSF.GetNbinsZ()+1):
+        for ix in range(1,hSF.GetNbinsX()+1):
+            for iy in range(1,hSF.GetNbinsY()+1):
+                for iz in range(1,hSF.GetNbinsZ()+1):
                     name = '%i_%i_%i' % (ix,iy,iz)
                     w[name] = np.ones_like(ds['mu_pt'])
                     up[name] = np.ones_like(ds['mu_pt'])
@@ -786,15 +786,18 @@ def createHistograms(category):
             iy = hSF.GetYaxis().FindBin(min(ipmax, ip))
             iz = hSF.GetZaxis().FindBin(min(etamax, np.abs(eta)))
             name = '%i_%i_%i' % (ix,iy,iz)
+            if name not in w:
+                print >> sys.stderr, 'Warning: Event with pt, ip, eta in underflow/overflow bin!' % (pt,ip,eta)
+                continue
             trgSF = hSF.GetBinContent(ix, iy, iz)
+            if trgSF <= 0:
+                print >> sys.stderr, 'Error: Event with pt, ip, eta has a trigger scale factor of 0!' % (pt,ip,eta)
+                sys.exit(1)
             ib = hSF.GetBin(ix, iy, iz)
             trgSFUnc = hSF.GetBinError(ib)
             w[name][i] *= trgSF
             up[name][i] *= trgSF + trgSFUnc
             down[name][i] *= trgSF - trgSFUnc
-            if trgSF == 0:
-                print pt, ip, np.abs(eta)
-                raise
 
         for name in w:
             up[name] /= w[name]
