@@ -777,6 +777,8 @@ def createHistograms(category):
             ix = hSF.GetXaxis().FindBin(min(ptmax, pt))
             iy = hSF.GetYaxis().FindBin(min(ipmax, ip))
             iz = hSF.GetZaxis().FindBin(min(etamax, np.abs(eta)))
+            # Make sure all the values are in between the bincenters, otherwise
+            # the interpolation doesn't work.
             if pt > hSF.GetXaxis().GetBinCenter(1) and \
                 ip > hSF.GetYaxis().GetBinCenter(1) and \
                 np.abs(eta) > hSF.GetZaxis().GetBinCenter(1) and \
