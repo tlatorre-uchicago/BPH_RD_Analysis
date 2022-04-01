@@ -782,9 +782,9 @@ def createHistograms(category):
             if pt > hSF.GetXaxis().GetBinCenter(1) and \
                 ip > hSF.GetYaxis().GetBinCenter(1) and \
                 np.abs(eta) > hSF.GetZaxis().GetBinCenter(1) and \
-                pt < hSF.GetXaxis(hsF.NbinsX()).GetBinCenter(1) and \
-                ip < hSF.GetYaxis(hsF.NbinsY()).GetBinCenter(1) and \
-                np.abs(eta) < hSF.GetZaxis(hsF.NbinsZ()).GetBinCenter(1):
+                pt < hSF.GetXaxis().GetBinCenter(hSF.GetNbinsX()) and \
+                ip < hSF.GetYaxis().GetBinCenter(hSF.GetNbinsY()) and \
+                np.abs(eta) < hSF.GetZaxis().GetBinCenter(hSF.GetNbinsZ()):
                 trgSF[i] = hSF.Interpolate(pt,ip,np.abs(eta))
             else:
                 trgSF[i] = hSF.GetBinContent(ix, iy, iz)
