@@ -579,7 +579,7 @@ def loadDatasets(category, loadRD):
             addCuts = [ ['M2_miss', -0.2, 1e3] ]
         
         addCuts += [
-        ['mu_pt', 12.5, 1e3],
+        ['mu_pt', 0, 1e3],
         # ['B_eta', -1., 1.],
         # ['pis_pt', 1., 1e3],
         ['mu_db_iso04', 0, 80],
@@ -763,7 +763,7 @@ def createHistograms(category):
     decayBR = pickle.load(open(dataDir+'/forcedDecayChannelsFactors_v2.pickle', 'rb'))
 
     loc = dataDir+'/calibration/triggerScaleFactors/'
-    fTriggerSF = rt.TFile.Open(loc + 'HLT_' + category.trg + '_SF_v22_count.root', 'READ')
+    fTriggerSF = rt.TFile.Open(loc + 'HLT_' + category.trg + '_SF_test_tony.root', 'READ')
     hTriggerSF = fTriggerSF.Get('hSF_HLT_' + category.trg)
     def computeTrgSF(ds, hSF, selection=None):
         trgSF = np.ones_like(ds['q2'])
@@ -778,9 +778,9 @@ def createHistograms(category):
             ix = hSF.GetXaxis().FindBin(min(ptmax, pt))
             iy = hSF.GetYaxis().FindBin(min(ipmax, ip))
             iz = hSF.GetZaxis().FindBin(min(etamax, np.abs(eta)))
-            trgSF[i] = hSF.Interpolate(pt,ip,np.abs(eta))
-            if trgSF[i] == 0:
-                trgSF[i] = hSF.GetBinContent(ix, iy, iz)
+            #trgSF[i] = hSF.Interpolate(pt,ip,np.abs(eta))
+            #if trgSF[i] == 0:
+            trgSF[i] = hSF.GetBinContent(ix, iy, iz)
             ib = hSF.GetBin(ix, iy, iz)
             trgSFUnc[i] = hSF.GetBinError(ib)
             if trgSF[i] == 0:
