@@ -85,7 +85,7 @@ def get_min_pt(ds):
     choicelist = np.array([np.zeros_like(ds['tkPt_0']),ds['tkPt_0'],ds['tkPt_1'],ds['tkPt_2'],ds['tkPt_2']])
     return np.select(condlist,choicelist)
 
-def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
+def get_ctrl_weights(ds,pt_min=0,pt_max=2,fraction=0.3,epsilon=1e-10):
     """
     Returns weights for events which move between control regions due to the
     lowest pt track not passing all cuts. For example, if extra tracks in data
@@ -579,14 +579,14 @@ def loadDatasets(category, loadRD):
             addCuts = [ ['M2_miss', -0.2, 1e3] ]
         
         addCuts += [
-        ['mu_pt', 0, 20],
+        ['mu_pt', 12.5, 1e3],
         # ['B_eta', -1., 1.],
         # ['pis_pt', 1., 1e3],
         ['mu_db_iso04', 0, 80],
-        ['mu_lostInnerHits', -2, 1],
-        ['K_lostInnerHits', -2, 1],
-        ['pi_lostInnerHits', -2, 1],
-        ['pis_lostInnerHits', -2, 1],
+        #['mu_lostInnerHits', -2, 1],
+        #['K_lostInnerHits', -2, 1],
+        #['pi_lostInnerHits', -2, 1],
+        #['pis_lostInnerHits', -2, 1],
         # ['mass_piK', 1.86483-0.035, 1.86483+0.035],
         # ['deltaM_DstD', 0.14543-1.e-3, 0.14543+1.e-3],
         # ['ctrl_tk_pval_0', 0.2, 1.0],
@@ -622,6 +622,7 @@ def loadDatasets(category, loadRD):
                         print var, 'not in', k, 'main dataset'
                         raise
                     sel = np.logical_and(sel, np.logical_and(dSet[k][var] > low, dSet[k][var] < high))
+                    print("cut %s cuts %.2f%% of the data" % (var,np.count_nonzero(~sel)*100/len(sel)))
 
                 orig = dSet[k]['ctrl'] == dSet[k]['ctrl2']
                 dSet[k] = dSet[k][sel]
@@ -777,7 +778,9 @@ def createHistograms(category):
             ix = hSF.GetXaxis().FindBin(min(ptmax, pt))
             iy = hSF.GetYaxis().FindBin(min(ipmax, ip))
             iz = hSF.GetZaxis().FindBin(min(etamax, np.abs(eta)))
-            trgSF[i] = hSF.GetBinContent(ix, iy, iz)
+            trgSF[i] = hSF.Interpolate(pt,ip,np.abs(eta))
+            if trgSF[i] == 0:
+                trgSF[i] = hSF.GetBinContent(ix, iy, iz)
             ib = hSF.GetBin(ix, iy, iz)
             trgSFUnc[i] = hSF.GetBinError(ib)
             if trgSF[i] == 0:
