@@ -335,7 +335,7 @@ def analyzeBin(idx, verbose=False):
         if args.dataset == 'RD':
             nSigTot = [np.sum(selTot), np.sqrt(np.sum(selTot))]
         else:
-            nSigTot = [np.sum(df['w'][selTot]), np.sqrt(np.sum(np.square(df['w'][selTot])))]
+            nSigTot = [np.sum(df['w'][selTot]), np.sqrt(np.sum(df['w'][selTot]))]
         if verbose:
             print 'Time: {:.1f} s'.format(time.time()-st)
             print ' --- Passed ---'
@@ -343,7 +343,7 @@ def analyzeBin(idx, verbose=False):
         if args.dataset == 'RD':
             nSigPass = [np.sum(selPass), np.sqrt(np.sum(selPass))]
         else:
-            nSigPass = [np.sum(df['w'][selPass]), np.sqrt(np.sum(np.square(df['w'][selPass])))]
+            nSigPass = [np.sum(df['w'][selPass]), np.sqrt(np.sum(df['w'][selPass]))]
     elif args.method == 'fit':
         canvTag = ''
         for n, i in idx.iteritems(): canvTag += n+str(i)
