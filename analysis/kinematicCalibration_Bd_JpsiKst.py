@@ -167,7 +167,7 @@ paramBeamSpotCorr = yaml.load(open(beamSpotCalLoc, 'r'))
 dfMC['wBeamSpot'] = getBeamSpotCorrectionWeights(dfMC, paramBeamSpotCorr, ref='bs')
 
 loc = dataLoc+'calibration/triggerScaleFactors/'
-fTriggerSF = rt.TFile.Open(loc + 'HLT_' + cat.trg + '_SF_v22_count.root', 'READ')
+fTriggerSF = rt.TFile.Open(loc + 'HLT_' + cat.trg + '_SF_v23_count.root', 'READ')
 hTriggerSF = fTriggerSF.Get('hSF_HLT_' + cat.trg)
 
 ptmax = hTriggerSF.GetXaxis().GetXmax() - 0.01
@@ -236,6 +236,9 @@ cuts = [
     ['B_eta', [-0.8, 0.8]],
     [mB_var, [5.24, 5.34]],
 ]
+
+if cat.name.lower() == 'high':
+    cuts += [['trgMu_pt', [14, 100]]]
 
 fout = open(webFolder + 'additionalSelection.txt', 'w')
 print 'Including cuts:'

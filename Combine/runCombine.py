@@ -51,6 +51,15 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "     Preliminary"
 donotdelete = []
 
+def reweight_lumi(ds, data):
+    lumiNum_mc = ds['lumiNum'].value_counts()
+    lumiNum_data = data['lumiNum'].value_counts()
+    w = np.ones_like(ds['mu_pt'])
+    for lumiNum in lumiNum_mc.index():
+        w[ds['lumiNum'] == lumiNum] *= lumiNum_data[lumiNum]/lumiNum_mc[lumiNum]
+    w *= len(w)/w.sum()
+
+
 def get_ctrl_group(ds):
     """
     Add a column specifying the control region. Here, the control region number
@@ -1004,6 +1013,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
+            weights['lumi'] = get_lumi_weights(ds,dSet['data'])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1464,6 +1474,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
+            weights['lumi'] = get_lumi_weights(ds,dSet['data'])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:

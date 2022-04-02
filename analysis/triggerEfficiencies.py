@@ -64,8 +64,8 @@ if args.HELP:
     exit()
 
 rt.gROOT.SetBatch(True)
-plt.ioff()
-plt.switch_backend('Agg')
+#plt.ioff()
+#plt.switch_backend('Agg')
 
 
 
@@ -138,7 +138,7 @@ elif args.dataset == 'MC':
 print 'Applying quality selection'
 df = df[ df['prescale'+args.trigger] > 0 ]
 df = df[ df['mProbe_'+args.muonID+'ID'] > 0.5 ]
-df = df[ df['deltaR_tagProbe'] > args.dR_TagProbe ]
+#df = df[ df['deltaR_tagProbe'] > args.dR_TagProbe ]
 # df = df[ np.abs(df['massMuMu'] - 3.09691) < args.mJpsiWindow ]
 df = df[ df['vtx_isGood'] > 0.5 ]
 df = df[ np.abs(df['massMuMu_refit'] - 3.09691) < args.mJpsiWindow ]

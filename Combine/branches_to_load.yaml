@@ -1,4 +1,5 @@
 all:
+ - lumiNum
  - q2
  - Est_mu
  - M2_miss
@@ -6,6 +7,8 @@ all:
  - mu_eta
  - mu_phi
  - mu_sigdxy
+ - dxy_vtxD0pismu_PV
+ - sigdxy_vtxD0_PV
  - mu_lostInnerHits
  - mu_sigIP3D_vtxDst
  - mu_db_iso04
