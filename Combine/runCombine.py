@@ -1013,7 +1013,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
-            weights['lumi'] = get_lumi_weights(ds,dSet['data'])
+            weights['lumi'] = reweight_lumi(ds,dSet['data'])
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1474,7 +1474,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
-            weights['lumi'] = get_lumi_weights(ds,dSet['data'])
+            weights['lumi'] = reweight_lumi(ds,dSet['data'])
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
