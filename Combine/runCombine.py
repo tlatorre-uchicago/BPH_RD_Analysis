@@ -56,7 +56,10 @@ def reweight_lumi(ds, data):
     lumiNum_data = data['lumiNum'].value_counts()
     w = np.ones_like(ds['mu_pt'])
     for lumiNum in lumiNum_mc.index:
-        w[ds['lumiNum'] == lumiNum] *= lumiNum_data[lumiNum]/lumiNum_mc[lumiNum]
+        if lumiNum not in lumiNum_data:
+            w[ds['lumiNum'] == lumiNum] *= 0
+        else:
+            w[ds['lumiNum'] == lumiNum] *= lumiNum_data[lumiNum]/lumiNum_mc[lumiNum]
     w *= len(w)/w.sum()
 
 
