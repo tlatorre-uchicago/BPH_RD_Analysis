@@ -61,7 +61,7 @@ def reweight_lumi(ds, data):
         else:
             w[ds['lumiNum'] == lumiNum] *= lumiNum_data[lumiNum]/lumiNum_mc[lumiNum]
     w *= len(w)/w.sum()
-
+    return w
 
 def get_ctrl_group(ds):
     """
