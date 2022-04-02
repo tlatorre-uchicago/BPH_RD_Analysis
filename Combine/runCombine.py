@@ -54,6 +54,8 @@ donotdelete = []
 def reweight_lumi(ds, data):
     lumiNum_mc = ds['lumiNum'].value_counts()
     lumiNum_data = data['lumiNum'].value_counts()
+    lumiNum_mc /= lumiNum_mc.sum()
+    lumiNum_data /= lumiNum_data.sum()
     w = np.ones_like(ds['mu_pt'])
     for lumiNum in lumiNum_mc.index:
         if lumiNum not in lumiNum_data:
