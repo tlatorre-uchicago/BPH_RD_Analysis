@@ -144,6 +144,12 @@ df = df[ df['vtx_isGood'] > 0.5 ]
 df = df[ np.abs(df['massMuMu_refit'] - 3.09691) < args.mJpsiWindow ]
 if args.tagTrigger:
     df = df[ df['mTag_HLT_' + args.tagTrigger] == 1 ]
+
+# Apply the L1 pt threshold cut before analysis, since that is how it's done in
+# runCombine.py
+probeTrigger = 'HLT_'+args.trigger
+ptThr = float(re.search('Mu[0-9]+_', probeTrigger).group(0)[2:-1])
+df = df[(df['mProbe_L1_pt'] > ptThr) & (np.abs(df['mProbe_L1_eta']) < 1.5) & (df['mProbe_L1_dR'] < 0.5)]
 print 'Total number of probe muons:', df.shape[0]
 
 def fitJpsi(xMass, passSel, canvasTag='', weights=None, mJpsiWindow=0.25, mBins=100, verbose=False):
@@ -366,7 +372,6 @@ def analyzeBin(idx, verbose=False):
 
 
 # # Run the fit in each bin
-probeTrigger = 'HLT_'+args.trigger
 
 if args.trigger == 'Mu7_IP4':
     binning = {'pt': array('d', [5.5, 6.5, 7, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 8, 8.5, 9, 9.2, 10, 12, 14]),
