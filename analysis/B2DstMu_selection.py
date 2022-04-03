@@ -21,8 +21,8 @@ def trigger_selection(j, ev, evEx, cat):
     if ev.trgMu_L1_dR[j] > 0.5:
         return False
     ptThr = float(re.search('Mu[0-9]+_', cat.trg).group(0)[2:-1])
-    if np.abs(ev.trgMu_L1_pt[j]) < ptThr:
-        return False
+    #if np.abs(ev.trgMu_L1_pt[j]) < ptThr:
+    #    return False
     if np.abs(ev.trgMu_L1_eta[j]) > 1.5:
         return False
 

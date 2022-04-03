@@ -762,7 +762,7 @@ def createHistograms(category):
     decayBR = pickle.load(open(dataDir+'/forcedDecayChannelsFactors_v2.pickle', 'rb'))
 
     loc = dataDir+'/calibration/triggerScaleFactors/'
-    fTriggerSF = rt.TFile.Open(loc + 'HLT_' + category.trg + '_SF_v23_count.root', 'READ')
+    fTriggerSF = rt.TFile.Open(loc + 'HLT_' + category.trg + '_SF_v32_count.root', 'READ')
     hTriggerSF = fTriggerSF.Get('hSF_HLT_' + category.trg)
     def computeTrgSF(ds, hSF, selection=None):
         trgSF = np.ones_like(ds['q2'])
@@ -770,7 +770,7 @@ def createHistograms(category):
         ptmax = hSF.GetXaxis().GetXmax() - 0.01
         ipmax = hSF.GetYaxis().GetXmax() - 0.01
         etamax = hSF.GetZaxis().GetXmax() - 0.01
-        x = np.column_stack((ds['mu_pt'], ds['mu_eta'], ds['mu_sigdxy']))
+        x = np.column_stack((ds['mu_pt'], ds['mu_eta'], ds['mu_sigdxy_PV']))
         if not selection is None:
             x = x[selection]
         for i, (pt, eta, ip) in enumerate(x):
@@ -791,8 +791,10 @@ def createHistograms(category):
             ib = hSF.GetBin(ix, iy, iz)
             trgSFUnc[i] = hSF.GetBinError(ib)
             if trgSF[i] == 0:
+                trgSF[i] = 0.9
+                trgSFUnc[i] = 0.1
                 print pt, ip, np.abs(eta)
-                raise
+                #raise
 
         # Divide them for the weight so later you can simply multiply back to get the value
         up = 1 + trgSFUnc/trgSF
