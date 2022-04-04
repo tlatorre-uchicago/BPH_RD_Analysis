@@ -49,7 +49,7 @@ parser.add_argument ('--method', '-M', type=str, default='count', choices=['coun
 parser.add_argument ('--refIP', type=str, default='BS', choices=['BS', 'PV'], help='Reference point for the impact parameter.')
 parser.add_argument ('--muonID', type=str, default='medium', choices=['soft', 'medium'], help='Muon ID')
 
-parser.add_argument ('--dR_TagProbe', type=float, default=0.2, help='Minimum delta R between tag and probe muon.')
+parser.add_argument ('--dR_TagProbe', type=float, default=0.0, help='Minimum delta R between tag and probe muon.')
 parser.add_argument ('--mJpsiWindow', type=float, default=-1, help='Width around J/psi mass to be considered. Default 0.1 (count) or 0.25 (fit).')
 parser.add_argument ('--parallel', '-p', type=int, default=15, help='Number of parallel CPU to use.')
 
@@ -133,7 +133,8 @@ elif args.dataset == 'MC':
     df = loadDF(MCdsLoc, branchesToLoad + ['sfMediumMuonID', 'sfSoftMuonID', 'nTrueIntMC', 'MC_mProbe_pt', 'MC_mProbe_eta', 'MC_mProbe_phi'])
     puRew = pileupReweighter(MCdsLoc[0], 'TnP/hAllNTrueIntMC', trg=args.trigger)
     df['wPileup'] = puRew.getPileupWeights(df['nTrueIntMC'])
-    df['w'] = df['sf'+args.muonID.capitalize()+'MuonID']*df['wPileup']
+    #df['w'] = df['sf'+args.muonID.capitalize()+'MuonID']*df['wPileup']
+    df['w'] = df['wPileup']
     CMS_lumi.extraText = "     Simulation Internal"
 print 'Applying quality selection'
 df = df[ df['prescale'+args.trigger] > 0 ]
@@ -318,14 +319,11 @@ def analyzeBin(idx, verbose=False):
     ## Require L1 mathing
     # dptRel = np.abs(df['mProbe_L1_pt']/df['mProbe_pt']) - 1
     l1Matching = np.logical_and(df['mProbe_L1_pt'] > 0, df['mProbe_L1_dR'] < 0.5)
-    selPass = np.logical_and(selTot, l1Matching)
+    selTot = np.logical_and(selTot, l1Matching)
     ptThr = float(re.search('Mu[0-9]+_', probeTrigger).group(0)[2:-1])
-    selPass = np.logical_and(selPass, df['mProbe_L1_pt'] > ptThr)
-    selPass = np.logical_and(selPass, np.abs(df['mProbe_L1_eta']) < 1.5)
-    selPass = np.logical_and(selPass, df['mProbe_' + probeTrigger] == 1)
-
-    # selPass = np.logical_and(selTot, df['mProbe_' + probeTrigger] == 1)
-
+    selTot = np.logical_and(selTot, df['mProbe_L1_pt'] > ptThr)
+    selTot = np.logical_and(selTot, np.abs(df['mProbe_L1_eta']) < 1.5)
+    selPass = np.logical_and(selTot, df['mProbe_' + probeTrigger] == 1)
 
     if verbose:
         print ' --- Total ---'
