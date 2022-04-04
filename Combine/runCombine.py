@@ -762,7 +762,7 @@ def createHistograms(category):
     decayBR = pickle.load(open(dataDir+'/forcedDecayChannelsFactors_v2.pickle', 'rb'))
 
     loc = dataDir+'/calibration/triggerScaleFactors/'
-    fTriggerSF = rt.TFile.Open(loc + 'HLT_' + category.trg + '_SF_v36_BS_count.root', 'READ')
+    fTriggerSF = rt.TFile.Open(loc + 'HLT_' + category.trg + '_SF_v36_PV_count.root', 'READ')
     hTriggerSF = fTriggerSF.Get('hSF_HLT_' + category.trg)
     def computeTrgSF(ds, hSF, selection=None):
         trgSF = np.ones_like(ds['q2'])
@@ -770,7 +770,7 @@ def createHistograms(category):
         ptmax = hSF.GetXaxis().GetXmax() - 0.01
         ipmax = hSF.GetYaxis().GetXmax() - 0.01
         etamax = hSF.GetZaxis().GetXmax() - 0.01
-        x = np.column_stack((ds['mu_pt'], ds['mu_eta'], ds['mu_sigdxy']))
+        x = np.column_stack((ds['mu_pt'], ds['mu_eta'], ds['mu_sigdxy_PV']))
         if not selection is None:
             x = x[selection]
         for i, (pt, eta, ip) in enumerate(x):

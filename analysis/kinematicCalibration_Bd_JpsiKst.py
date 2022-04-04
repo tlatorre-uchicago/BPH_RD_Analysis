@@ -15,6 +15,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import uproot as ur
 import ROOT as rt
+rt.PyConfig.IgnoreCommandLineOptions = True
 rt.gErrorIgnoreLevel = rt.kError
 rt.RooMsgService.instance().setGlobalKillBelow(rt.RooFit.ERROR)
 import root_numpy as rtnp
@@ -175,7 +176,7 @@ if args.BScal:
     dfMC['wBeamSpot'] = getBeamSpotCorrectionWeights(dfMC, paramBeamSpotCorr, ref='bs')
 
 loc = dataLoc+'calibration/triggerScaleFactors/'
-fTriggerSF = rt.TFile.Open(loc + 'HLT_' + cat.trg + '_SF_v23_count.root', 'READ')
+fTriggerSF = rt.TFile.Open(loc + 'HLT_' + cat.trg + '_SF_v36_PV_count.root', 'READ')
 hTriggerSF = fTriggerSF.Get('hSF_HLT_' + cat.trg)
 
 ptmax = hTriggerSF.GetXaxis().GetXmax() - 0.01
@@ -186,7 +187,7 @@ nX = hTriggerSF.GetNbinsX()
 ptWeight = [[] for k in range(nX+2)]
 
 dfMC['trgSF'] = np.ones(dfMC.shape[0])
-for i, (pt, eta, ip) in enumerate(dfMC[['trgMu_pt', 'trgMu_eta', 'trgMu_sigdxy']].values):
+for i, (pt, eta, ip) in enumerate(dfMC[['trgMu_pt', 'trgMu_eta', 'trgMu_sigdxy_PV']].values):
     ix = hTriggerSF.GetXaxis().FindBin(min(ptmax, pt))
     iy = hTriggerSF.GetYaxis().FindBin(min(ipmax, ip))
     iz = hTriggerSF.GetZaxis().FindBin(min(etamax, np.abs(eta)))
@@ -225,7 +226,8 @@ for i, (ptp, etap, ptm, etam) in enumerate(dfMC[['MC_mup_pt', 'MC_mup_eta', 'MC_
     wm = hMuonIDSF.GetBinContent(ix, iy)
     dfMC.at[i, 'muonSF'] = wp * wm
 
-dfMC['w'] = dfMC['wPU']*dfMC['muonSF']*dfMC['trgSF']#
+#dfMC['w'] = dfMC['wPU']*dfMC['muonSF']*dfMC['trgSF']#
+dfMC['w'] = dfMC['wPU']*dfMC['trgSF']
 if args.BScal:
     dfMC['w'] *= dfMC['wBeamSpot']
 
