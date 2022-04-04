@@ -12,6 +12,7 @@ import multiprocessing
 import matplotlib.pyplot as plt
 import uproot as ur
 import ROOT as rt
+rt.PyConfig.IgnoreCommandLineOptions = True
 import root_numpy as rtnp
 import ROOT.RooFit as rf
 from scipy.special import erf
@@ -39,7 +40,6 @@ parser = argparse.ArgumentParser(description='Script used to run trigger efficie
                                  epilog='Test example: ./triggerEfficiencies.py',
                                  add_help=True
                                  )
-parser.add_argument ('--HELP', '-H', default=False, action='store_true', help='Print help message.')
 parser.add_argument ('--version', '-v', default='test', help='Version name.')
 
 parser.add_argument ('--dataset', '-d', type=str, default='MC', choices=['RD', 'MC'], help='Dataset to use.')
