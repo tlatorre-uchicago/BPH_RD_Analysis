@@ -22,6 +22,8 @@ def make_results_table(version=None, cat=None, includeDirs=None, nPulls=4, skipD
             auxDirs.append(d)
         dirs += auxDirs
 
+    dirs = sorted(dirs)
+
     if includeDirs is not None:
         auxDirs = []
         for d in includeDirs:

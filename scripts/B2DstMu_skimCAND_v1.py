@@ -36,6 +36,7 @@ from categoriesDef import categories
 from B2DstMu_selection import candidate_selection, trigger_selection
 
 import ROOT as rt
+rt.PyConfig.IgnoreCommandLineOptions = True
 rt.gErrorIgnoreLevel = rt.kError
 rt.RooMsgService.instance().setGlobalKillBelow(rt.RooFit.ERROR)
 import root_numpy as rtnp
