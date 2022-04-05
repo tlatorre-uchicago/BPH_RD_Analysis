@@ -28,7 +28,7 @@ def trigger_selection(j, ev, evEx, cat):
 
     if not exclusiveTrigger(j, ev, 'HLT_' + cat.trg):
         return False
-    if evEx.mu_pt < cat.min_pt or evEx.mu_pt > cat.max_pt:
+    if ev.trgMu_pt[j] < cat.min_pt or ev.trgMu_pt[j] > cat.max_pt:
         return False
     if not ev.trgMu_sigdxy_BS[j] > cat.minIP:
         return False
