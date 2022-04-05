@@ -171,25 +171,7 @@ def get_pt_weights(ds,cat,fraction=0.3,epsilon=1e-10):
     w = np.ones_like(ds['mu_pt'])
     down = w
 
-    # The conditions here are:
-    #
-    #     1. This is an original event with no extra tracks.
-    #     2. This is an original event which got moved.
-    #     3. This is an original event which didn't get moved.
-    #     4. This is a duplicate event which got moved.
-    #     5. This is a duplicate event which didn't get moved.
-    pt = (ds['tkPt_last'] > pt_min) & (ds['tkPt_last'] < pt_max)
-    condlist = [orig & (ds['ctrl'] == 0),
-                orig & pt,
-                orig & ~pt,
-                ~orig & pt,
-                ~orig & ~pt]
-    if cat == 'high':
-        up = np.where(ds['mu_pt'] < 12.4,fraction,1)
-    elif cat == 'mid':
-        up = np.where(ds['mu_pt'] < 9.4,fraction,1)
-    elif cat == 'low':
-        up = np.where(ds['mu_pt'] < 7.4,fraction,1)
+    up = np.where(ds['mu_pt'] < cat.min_pt*(1+0.02),fraction,1)
     return w, up/w, down/w
 
 # The tuple have: 1) procId (set in B2DstMu_skimCAND_v1.py), 2) central value (relative to Monte Carlo cards), 3) relative uncertainty, 4) multiplication factor for relative uncertainty
@@ -1062,7 +1044,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
-            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category.name)
+            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category)
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1523,7 +1505,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
-            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category.name)
+            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category)
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
