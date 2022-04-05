@@ -65,7 +65,7 @@ mc:
  - MC_tkFromMainB_0
  - MC_tkFromMainB_1
  - MC_nInteractions
- - mu_sigdxy_PV
+ #- mu_sigdxy_PV
 
 signal:
  - wh_CLNCentral
