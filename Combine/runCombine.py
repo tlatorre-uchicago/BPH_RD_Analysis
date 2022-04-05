@@ -136,6 +136,62 @@ def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     up = np.select(condlist,[1,1-fraction,1,fraction,0])
     return w, up/w, down/w
 
+def get_pt_weights(ds,cat,fraction=0.3,epsilon=1e-10):
+    """
+    Returns weights for events which move between control regions due to the
+    lowest pt track not passing all cuts. For example, if extra tracks in data
+    are less likely to be reconstructed or pass the goodness of fit tests with
+    the vertex, they will end up being in a different control region. The
+    possible movements of the events are: ppp -> pp, ppm -> pp, pmp -> pm, pmm
+    -> pm, mmp -> mm, mmm -> mm, ,pm -> p, mp -> m, p -> signal, m -> signal.
+
+    Returns a tuple (weight, up, down), where weight is the default weights
+    (which assigns `epsilon` to all duplicate events and 1 to all original
+    events), up is the weights for when events move divided by the original
+    weights, and down is the weights for when data is *more* likely to
+    reconstruct extra tracks divided by the original weights (currently assumed
+    to not happen, since this seems unlikely and there is no way currently to
+    know the pt of tracks which *almost* got reconstructed).
+
+    Parameters
+    ----------
+    ds: dataframe
+        Events to calculae weights for.
+    pt_min: float
+        The minimum pt of events being moved.
+    pt_max: float
+        The maximum pt of events being moved.
+    fraction: float
+        The fraction of events whose lowest pt track falls in between `pt_min`
+        and `pt_max` which are moved.
+    epsilon: float
+        Small weight given to duplicate events.
+    """
+    orig = ds['ctrl'] == ds['ctrl2']
+    w = np.ones_like(ds['mu_pt'])
+    down = w
+
+    # The conditions here are:
+    #
+    #     1. This is an original event with no extra tracks.
+    #     2. This is an original event which got moved.
+    #     3. This is an original event which didn't get moved.
+    #     4. This is a duplicate event which got moved.
+    #     5. This is a duplicate event which didn't get moved.
+    pt = (ds['tkPt_last'] > pt_min) & (ds['tkPt_last'] < pt_max)
+    condlist = [orig & (ds['ctrl'] == 0),
+                orig & pt,
+                orig & ~pt,
+                ~orig & pt,
+                ~orig & ~pt]
+    if cat == 'high':
+        up = np.where(ds['mu_pt'] < 12.4,fraction,1)
+    elif cat == 'mid':
+        up = np.where(ds['mu_pt'] < 9.4,fraction,1)
+    elif cat == 'low':
+        up = np.where(ds['mu_pt'] < 7.4,fraction,1)
+    return w, up/w, down/w
+
 # The tuple have: 1) procId (set in B2DstMu_skimCAND_v1.py), 2) central value (relative to Monte Carlo cards), 3) relative uncertainty, 4) multiplication factor for relative uncertainty
 uncertainties_DstPi_mix = np.genfromtxt('uncertainties_DstPi_processes.txt', dtype=None)
 uncertainties_DstPiPi_mix = np.genfromtxt('uncertainties_DstPiPi_processes.txt', dtype=None)
@@ -1006,6 +1062,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
+            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category.name)
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1466,6 +1523,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
+            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category.name)
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
@@ -2759,6 +2817,7 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
             card += n+' shape' + mcProcStr*nCat + '\n'
 
     card += 'ctrl shape' + mcProcStr*nCat + '\n'
+    card += 'pt shape' + mcProcStr*nCat + '\n'
 
     # B eta uncertainty
     names = []
