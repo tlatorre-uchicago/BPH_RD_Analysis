@@ -1287,7 +1287,7 @@ def createSubmissionFile(tmpDir, njobs):
         fsub.write('error         = {}/out/job_$(ProcId)_$(ClusterId).err\n'.format(tmpDir))
         fsub.write('log           = {}/out/job_$(ProcId)_$(ClusterId).log\n'.format(tmpDir))
         fsub.write('WHEN_TO_TRANSFER_OUTPUT = ON_EXIT_OR_EVICT\n')
-        fsub.write('+JobQueue="Normal"\n')
+        fsub.write('+JobQueue="Short"\n')
         # fsub.write('+RequestWalltime   = 7000\n')
         fsub.write('+MaxRuntime   = 7000\n')
         fsub.write('+RunAsOwner = True\n')
