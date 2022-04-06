@@ -614,6 +614,8 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], maxEvents=
                 print 'Submitting jobs'
                 cmd = 'condor_submit {}/jobs.jdl'.format(tmpDir)
                 batch_name = 'skim_Bd2JpsiKst_%s_%s' % (n,catName)
+                if applyCorrections:
+                    batch_name += '_corr'
                 cmd += ' -batch-name %s' % batch_name
                 status, output = commands.getstatusoutput(cmd)
                 if status !=0:

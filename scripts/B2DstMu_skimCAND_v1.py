@@ -1200,6 +1200,8 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], trkControl
                 batch_name = 'skim_%s_%s' % (n,catName)
                 if trkControlRegion:
                     batch_name += '_trkControl'
+                if applyCorrections:
+                    batch_name += '_corr'
                 cmd += ' -batch-name %s' % batch_name
                 status, output = commands.getstatusoutput(cmd)
                 if status != 0:
