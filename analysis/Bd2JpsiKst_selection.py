@@ -15,19 +15,19 @@ def exclusiveTrigger(j, ev, trgAcc, trgNegate = []):
 def trigger_selection(iMu, ev, cat, muPt, muEta):
     if ev.trgMu_L1_dR[iMu] > 0.5:
         return False
-    #ptThr = float(re.search('Mu[0-9]+_', cat.trg).group(0)[2:-1])
-    #if np.abs(ev.trgMu_L1_pt[iMu]) < ptThr:
-    #    return False
-    #if np.abs(ev.trgMu_L1_eta[iMu]) > 1.5:
-    #    return False
+    ptThr = float(re.search('Mu[0-9]+_', cat.trg).group(0)[2:-1])
+    if np.abs(ev.trgMu_L1_pt[iMu]) < ptThr:
+        return False
+    if np.abs(ev.trgMu_L1_eta[iMu]) > 1.5:
+        return False
 
-    #if not exclusiveTrigger(iMu, ev, 'HLT_' + cat.trg):
-    #    return False
+    if not exclusiveTrigger(iMu, ev, 'HLT_' + cat.trg):
+        return False
 
     if muPt < cat.min_pt or muPt > cat.max_pt:
         return False
-    #if not ev.trgMu_sigdxy_BS[iMu] > cat.minIP:
-    #    return False
+    if not ev.trgMu_sigdxy_BS[iMu] > cat.minIP:
+        return False
     if not abs(muEta) < 1.5:
         return False
     return True

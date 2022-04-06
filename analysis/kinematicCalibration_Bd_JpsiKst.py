@@ -152,9 +152,7 @@ mcSample = DSetLoader('Bd_JpsiKst_General', candDir='ntuples_Bd2JpsiKst_220328',
 dsetMC_loc = mcSample.skimmed_dir + '/{}_corr.root'.format(cat.name)
 dfMC = pd.DataFrame(rtnp.root2array(dsetMC_loc))
 
-plt.hist(dfMC['trgMu_sigdxy'],bins=100)
-plt.show()
-dfMC = dfMC[dfMC['trgMu_sigdxy'] > 9]
+#dfMC = dfMC[dfMC['trgMu_sigdxy'] > 9]
 #dfMC = dfMC[dfMC['trgMu_pt'] > 12.4]
 centralVal = 0.985
 dfMC['pt'] = np.where((dfMC['trgMu_pt']*centralVal > cat.min_pt2) & (dfMC['trgMu_pt']*centralVal < cat.max_pt2),1,1e-10)
@@ -266,10 +264,26 @@ CMS_lumi.integrated_lumi = lumi_tot
 dsetRD_loc = dataLoc+'cmsRD/skimmed'+args.skimTag+'/B2JpsiKst_220328_{}_corr.root'.format(cat.name)
 dfRD = pd.DataFrame(rtnp.root2array(dsetRD_loc))
 #dfRD = dfRD[(dfRD.trgMu_pt > cat.min_pt2) & (dfRD.trgMu_pt < cat.max_pt2)]
-dfMC = dfMC[dfMC['trgMu_sigdxy'] > 8]
+#dfMC = dfMC[dfMC['trgMu_sigdxy'] > 8]
 N_sel_per_fb = float(dfRD.shape[0])/lumi_tot
 print 'Selected events per fb: {:.0f}'.format(N_sel_per_fb)
+bins = np.linspace(0,1000,999)
+data_hist = np.histogram(dfRD['trgMu_sigdxy'],bins=bins,density=True)[0]
+mc_hist = np.histogram(dfMC['trgMu_sigdxy'],bins=bins,density=True)[0]
+ratio = data_hist/mc_hist
+ratio[~np.isfinite(ratio)] = 1
+bincenters = (bins[1:] + bins[:-1])/2
+dfMC['sigdxy'] = np.interp(dfMC['trgMu_sigdxy'],bincenters,ratio)
+plt.hist(dfRD['trgMu_sigdxy'],bins=np.linspace(0,100,100),histtype='step',label='data',normed=True)
+plt.hist(dfMC['trgMu_sigdxy'],bins=np.linspace(0,100,100),histtype='step',label='MC',normed=True)
+plt.hist(dfMC['trgMu_sigdxy'],weights=dfMC['sigdxy'],bins=np.linspace(0,100,100),histtype='step',label='MC (after weights)',normed=True)
+plt.legend()
+plt.show()
+dfMC['w'] *= dfMC['sigdxy']
 
+#plt.hist(dfMC['trgMu_pt'],bins=np.linspace(0,10,100),histtype='step',label='before')
+#plt.hist(dfMC['trgMu_pt'],weights=dfMC['pt'],bins=np.linspace(0,10,100),histtype='step',label='after')
+#plt.show()
 # # Clean sets
 cuts = [
     ['trgMu_eta', [-0.8, 0.8]],
