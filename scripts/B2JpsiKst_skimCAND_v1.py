@@ -617,7 +617,8 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], maxEvents=
                 createSubmissionFile(tmpDir, len(inputs))
                 print 'Submitting jobs'
                 cmd = 'condor_submit {}/jobs.jdl'.format(tmpDir)
-                cmd += ' -batch-name skim_' + n
+                batch_name = 'skim_%s_%s' % (n,catName)
+                cmd += ' -batch-name %s' % batch_name
                 status, output = commands.getstatusoutput(cmd)
                 if status !=0:
                     print 'Error in processing command:\n   ['+cmd+']'
