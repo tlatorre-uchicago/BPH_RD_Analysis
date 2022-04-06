@@ -554,8 +554,8 @@ def loadDatasets(category, loadRD):
 
         # Apply the secondary pt cuts here. These are handled for MC in the
         # get_pt_weights function.
-        dSet['data'] = dSet['data'][(dSet['data'].trgMu_pt > category.min_pt2) & (dSet['data'].trgMu_pt < category.min_pt2)]
-        dSetTkSide['data'] = dSetTkSide['data'][(dSetTkSide['data'].trgMu_pt > category.min_pt2) & (dSetTkSide['data'].trgMu_pt < category.min_pt2)]
+        dSet['data'] = dSet['data'][(dSet['data'].trgMu_pt > category.min_pt2) & (dSet['data'].trgMu_pt < category.max_pt2)]
+        dSetTkSide['data'] = dSetTkSide['data'][(dSetTkSide['data'].trgMu_pt > category.min_pt2) & (dSetTkSide['data'].trgMu_pt < category.max_pt2)]
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])

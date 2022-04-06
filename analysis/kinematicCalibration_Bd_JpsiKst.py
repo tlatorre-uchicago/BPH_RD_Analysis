@@ -152,7 +152,14 @@ mcSample = DSetLoader('Bd_JpsiKst_General', candDir='ntuples_Bd2JpsiKst_220328',
 dsetMC_loc = mcSample.skimmed_dir + '/{}_corr.root'.format(cat.name)
 dfMC = pd.DataFrame(rtnp.root2array(dsetMC_loc))
 
-dfMC = dfMC[dfMC['trgMu_pt'] > 12.4]
+#dfMC = dfMC[dfMC['trgMu_pt'] > 12.4]
+centralVal = 0.98
+dfMC['pt'] = np.where((dfMC['trgMu_pt']*centralVal > cat.min_pt2) & (dfMC['trgMu_pt']*centralVal < cat.max_pt2),1,1e-10)
+dfMC['pt'] = np.ones_like(dfMC['trgMu_pt'])
+
+#plt.hist(dfMC['trgMu_pt'],bins=np.linspace(0,10,100),histtype='step',label='before')
+#plt.hist(dfMC['trgMu_pt'],weights=dfMC['pt'],bins=np.linspace(0,10,100),histtype='step',label='after')
+#plt.show()
 
 
 effMCgen = mcSample.effMCgen
@@ -229,7 +236,7 @@ dfMC['muonSF'] = np.ones(dfMC.shape[0])
 #    dfMC.at[i, 'muonSF'] = wp * wm
 
 #dfMC['w'] = dfMC['wPU']*dfMC['muonSF']*dfMC['trgSF']#
-dfMC['w'] = dfMC['wPU']*dfMC['trgSF']
+dfMC['w'] = dfMC['wPU']*dfMC['trgSF']*dfMC['pt']
 if args.BScal:
     dfMC['w'] *= dfMC['wBeamSpot']
 
@@ -254,6 +261,7 @@ CMS_lumi.integrated_lumi = lumi_tot
 
 dsetRD_loc = dataLoc+'cmsRD/skimmed'+args.skimTag+'/B2JpsiKst_220328_{}_corr.root'.format(cat.name)
 dfRD = pd.DataFrame(rtnp.root2array(dsetRD_loc))
+dfRD = dfRD[(dfRD.trgMu_pt > cat.min_pt2) & (dfRD.trgMu_pt < cat.max_pt2)]
 N_sel_per_fb = float(dfRD.shape[0])/lumi_tot
 print 'Selected events per fb: {:.0f}'.format(N_sel_per_fb)
 
