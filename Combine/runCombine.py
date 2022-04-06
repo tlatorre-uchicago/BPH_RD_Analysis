@@ -138,20 +138,22 @@ def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
 
 def get_pt_weights(ds,cat,centralVal=1,scale=0.02,epsilon=1e-10):
     """
-    Returns weights for events which move between control regions due to the
-    lowest pt track not passing all cuts. For example, if extra tracks in data
-    are less likely to be reconstructed or pass the goodness of fit tests with
-    the vertex, they will end up being in a different control region. The
-    possible movements of the events are: ppp -> pp, ppm -> pp, pmp -> pm, pmm
-    -> pm, mmp -> mm, mmm -> mm, ,pm -> p, mp -> m, p -> signal, m -> signal.
+    Returns weights for a muon pt scale shift (as it relates to how the events
+    are binned into categories). Basically if there is a difference between the
+    muon pt scale in data and MC this will affect how events are binned into
+    the low, mid, and high categories. In principle, we would allow this
+    parameter to float before events are binned into categories, but since that
+    happens upstream, we do the next best thing which is apply a secondary cut
+    to the pt spectrum which is tighter and then allow the MC pt scale to shift
+    and determine how that affects which events end up in this tighter pt
+    region.
 
     Returns a tuple (weight, up, down), where weight is the default weights
-    (which assigns `epsilon` to all duplicate events and 1 to all original
-    events), up is the weights for when events move divided by the original
-    weights, and down is the weights for when data is *more* likely to
-    reconstruct extra tracks divided by the original weights (currently assumed
-    to not happen, since this seems unlikely and there is no way currently to
-    know the pt of tracks which *almost* got reconstructed).
+    when the muon pt is scaled by `centralVal` (which assigns `epsilon` to all
+    events which fall outside of the tighter pt range and 1 to all events which
+    fall inside the range), up is the weights for when the muon pt is scaled by
+    centralVal*(1+scale) divided by the original weights, and down is the
+    weights for when data is scaled by centralVal*(1-scale).
 
     Parameters
     ----------
