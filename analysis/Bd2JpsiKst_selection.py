@@ -26,8 +26,8 @@ def trigger_selection(iMu, ev, cat, muPt, muEta):
 
     if muPt < cat.min_pt or muPt > cat.max_pt:
         return False
-    if not ev.trgMu_sigdxy_BS[iMu] > cat.minIP:
-        return False
+    #if not ev.trgMu_sigdxy_BS[iMu] > cat.minIP:
+    #    return False
     if not abs(muEta) < 1.5:
         return False
     return True
