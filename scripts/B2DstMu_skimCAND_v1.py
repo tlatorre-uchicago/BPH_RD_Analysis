@@ -203,6 +203,8 @@ def extractEventInfos(j, ev, corr=None):
     e.mu_eta = ev.mu_refitD0pismu_eta[j]
     e.mu_phi = ev.mu_refitD0pismu_phi[j]
     e.mu_pt = correctPt(ev.mu_refitD0pismu_pt[j], e.mu_eta, e.mu_phi, corr, 3e-3)
+    if hasattr(ev, 'MC_addTkFlag'):
+        e.mu_pt *= 0.985
 
     p4_D0 = rt.TLorentzVector()
     p4_D0.SetPtEtaPhiM(e.D0_pt, e.D0_eta, e.D0_phi, e.mass_piK)
