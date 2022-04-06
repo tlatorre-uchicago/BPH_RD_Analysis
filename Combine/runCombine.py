@@ -136,7 +136,7 @@ def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     up = np.select(condlist,[1,1-fraction,1,fraction,0])
     return w, up/w, down/w
 
-def get_pt_weights(ds,cat,fraction=0.3,epsilon=1e-10):
+def get_pt_weights(ds,cat,centralVal=1,scale=0.02,epsilon=1e-10):
     """
     Returns weights for events which move between control regions due to the
     lowest pt track not passing all cuts. For example, if extra tracks in data
@@ -167,11 +167,9 @@ def get_pt_weights(ds,cat,fraction=0.3,epsilon=1e-10):
     epsilon: float
         Small weight given to duplicate events.
     """
-    orig = ds['ctrl'] == ds['ctrl2']
-    w = np.ones_like(ds['mu_pt'])
-    down = w
-
-    up = np.where(ds['mu_pt'] < cat.min_pt*(1+0.02),fraction,1)
+    w = np.where((ds['trgMu_pt']*centralVal > cat.min_pt2) & (ds['trgMu_pt']*centralVal < cat.max_pt2),1,epsilon)
+    up = np.where((ds['trgMu_pt']*centralVal*(1+scale) > cat.min_pt2) & (ds['trgMu_pt']*centralVal*(1+scale) < cat.max_pt2),1,epsilon)
+    down = np.where((ds['trgMu_pt']*centralVal*(1-scale) > cat.min_pt2) & (ds['trgMu_pt']*centralVal*(1-scale) < cat.max_pt2),1,epsilon)
     return w, up/w, down/w
 
 # The tuple have: 1) procId (set in B2DstMu_skimCAND_v1.py), 2) central value (relative to Monte Carlo cards), 3) relative uncertainty, 4) multiplication factor for relative uncertainty
@@ -552,6 +550,11 @@ def loadDatasets(category, loadRD):
         locRD = dataDir+'/skimmed'+args.skimmedTagRD+'/B2DstMu_{}_{}'.format(creation_date, category.name)
         dSet['data'] = load_data(locRD + '_corr.root', branches=relevantBranches['all'])
         dSetTkSide['data'] = load_data(locRD + '_trkCtrl_corr.root', branches=relevantBranches['all'])
+
+        # Apply the secondary pt cuts here. These are handled for MC in the
+        # get_pt_weights function.
+        dSet['data'] = dSet['data'][(dSet['data'].trgMu_pt > category.min_pt2) & (dSet['data'].trgMu_pt < category.min_pt2)]
+        dSetTkSide['data'] = dSetTkSide['data'][(dSet['data'].trgMu_pt > category.min_pt2) & (dSet['data'].trgMu_pt < category.min_pt2)]
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
@@ -1044,7 +1047,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
-            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category)
+            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category,0.98)
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1505,7 +1508,7 @@ def createHistograms(category):
         weights = {}
         if 'data' not in n:
             weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
-            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category)
+            weights['pt'], wVar['ptUp'], wVar['ptDown'] = get_pt_weights(ds,category,0.98)
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
