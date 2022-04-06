@@ -168,9 +168,9 @@ def get_pt_weights(ds,cat,centralVal=1,scale=0.02,epsilon=1e-2):
     epsilon: float
         Small weight given to duplicate events.
     """
-    w = np.where((ds['trgMu_pt']*centralVal > cat.min_pt2) & (ds['trgMu_pt']*centralVal < cat.max_pt2),1,epsilon)
-    up = np.where((ds['trgMu_pt']*centralVal*(1+scale) > cat.min_pt2) & (ds['trgMu_pt']*centralVal*(1+scale) < cat.max_pt2),1,epsilon)
-    down = np.where((ds['trgMu_pt']*centralVal*(1-scale) > cat.min_pt2) & (ds['trgMu_pt']*centralVal*(1-scale) < cat.max_pt2),1,epsilon)
+    w = np.where((ds['mu_pt']*centralVal > cat.min_pt2) & (ds['mu_pt']*centralVal < cat.max_pt2),1,epsilon)
+    up = np.where((ds['mu_pt']*centralVal*(1+scale) > cat.min_pt2) & (ds['mu_pt']*centralVal*(1+scale) < cat.max_pt2),1,epsilon)
+    down = np.where((ds['mu_pt']*centralVal*(1-scale) > cat.min_pt2) & (ds['mu_pt']*centralVal*(1-scale) < cat.max_pt2),1,epsilon)
     return w, up/w, down/w
 
 # The tuple have: 1) procId (set in B2DstMu_skimCAND_v1.py), 2) central value (relative to Monte Carlo cards), 3) relative uncertainty, 4) multiplication factor for relative uncertainty
@@ -554,8 +554,8 @@ def loadDatasets(category, loadRD):
 
         # Apply the secondary pt cuts here. These are handled for MC in the
         # get_pt_weights function.
-        dSet['data'] = dSet['data'][(dSet['data'].trgMu_pt > category.min_pt2) & (dSet['data'].trgMu_pt < category.max_pt2)]
-        dSetTkSide['data'] = dSetTkSide['data'][(dSetTkSide['data'].trgMu_pt > category.min_pt2) & (dSetTkSide['data'].trgMu_pt < category.max_pt2)]
+        dSet['data'] = dSet['data'][(dSet['data'].mu_pt > category.min_pt2) & (dSet['data'].mu_pt < category.max_pt2)]
+        dSetTkSide['data'] = dSetTkSide['data'][(dSetTkSide['data'].mu_pt > category.min_pt2) & (dSetTkSide['data'].mu_pt < category.max_pt2)]
 
     for name in dSet:
         dSet[name]['ctrl'] = get_ctrl_group(dSet[name])
