@@ -136,7 +136,7 @@ def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     up = np.select(condlist,[1,1-fraction,1,fraction,0])
     return w, up/w, down/w
 
-def get_pt_weights(ds,cat,centralVal=1,scale=0.02,epsilon=1e-10):
+def get_pt_weights(ds,cat,centralVal=1,scale=0.02,epsilon=1e-2):
     """
     Returns weights for a muon pt scale shift (as it relates to how the events
     are binned into categories). Basically if there is a difference between the
