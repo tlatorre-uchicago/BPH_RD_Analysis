@@ -372,7 +372,6 @@ def makeSelection(inputs):
 
             aux = (ev.runNum, ev.lumiNum, ev.eventNum,
                    evEx.trgMu_pt, evEx.trgMu_eta, evEx.trgMu_sigdxy,
-                   evEx.trgMu_sigdxy_PV,
                    evEx.otherMu_pt, evEx.otherMu_eta, evEx.otherMu_phi,
                    evEx.mum_pt, evEx.mum_eta, evEx.mum_phi,
                    ev.mum_dxy_PV[j], ev.mum_lostInnerHits[j],
@@ -523,7 +522,6 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], maxEvents=
 
         leafs_names = [ 'runNum', 'lumiNum', 'eventNum',
                         'trgMu_pt', 'trgMu_eta', 'trgMu_sigdxy',
-                        'trgMu_sigdxy_PV',
                         'otherMu_pt', 'otherMu_eta', 'otherMu_phi',
                         'mum_pt', 'mum_eta', 'mum_phi',
                         'mum_dxy', 'mum_lostInnerHits',
