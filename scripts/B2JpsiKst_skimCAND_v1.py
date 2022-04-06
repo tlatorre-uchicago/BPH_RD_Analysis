@@ -126,16 +126,12 @@ def extractEventInfos(j, ev, corr=None):
     e.mup_eta = ev.mupRefit_eta[j]
     e.mup_phi = ev.mupRefit_phi[j]
     e.mup_pt = correctPt(ev.mupRefit_pt[j], e.mup_eta, e.mup_phi, corr, 3e-3)
-    if hasattr(ev, 'MC_addTkFlag'):
-        e.mup_pt *= 0.985
     p4_mup = rt.TLorentzVector()
     p4_mup.SetPtEtaPhiM(e.mup_pt, e.mup_eta, e.mup_phi, m_mu)
 
     e.mum_eta = ev.mumRefit_eta[j]
     e.mum_phi = ev.mumRefit_phi[j]
     e.mum_pt = correctPt(ev.mumRefit_pt[j], e.mum_eta, e.mum_phi, corr, 3e-3)
-    if hasattr(ev, 'MC_addTkFlag'):
-        e.mum_pt *= 0.985
     p4_mum = rt.TLorentzVector()
     p4_mum.SetPtEtaPhiM(e.mum_pt, e.mum_eta, e.mum_phi, m_mu)
 

@@ -155,6 +155,7 @@ dfMC = pd.DataFrame(rtnp.root2array(dsetMC_loc))
 #dfMC = dfMC[dfMC['trgMu_pt'] > 12.4]
 centralVal = 0.985
 dfMC['pt'] = np.where((dfMC['trgMu_pt']*centralVal > cat.min_pt2) & (dfMC['trgMu_pt']*centralVal < cat.max_pt2),1,1e-10)
+dfMC['pt'] = np.ones_like(dfMC['trgMu_pt'])
 
 #plt.hist(dfMC['trgMu_pt'],bins=np.linspace(0,10,100),histtype='step',label='before')
 #plt.hist(dfMC['trgMu_pt'],weights=dfMC['pt'],bins=np.linspace(0,10,100),histtype='step',label='after')
