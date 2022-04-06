@@ -105,7 +105,7 @@ def get_ctrl_weights(ds,pt_min=0,pt_max=1,fraction=0.3,epsilon=1e-10):
     Parameters
     ----------
     ds: dataframe
-        Events to calculae weights for.
+        Events to calculate weights for.
     pt_min: float
         The minimum pt of events being moved.
     pt_max: float
@@ -156,14 +156,13 @@ def get_pt_weights(ds,cat,centralVal=1,scale=0.02,epsilon=1e-10):
     Parameters
     ----------
     ds: dataframe
-        Events to calculae weights for.
-    pt_min: float
-        The minimum pt of events being moved.
-    pt_max: float
-        The maximum pt of events being moved.
-    fraction: float
-        The fraction of events whose lowest pt track falls in between `pt_min`
-        and `pt_max` which are moved.
+        Events to calculate weights for.
+    cat: Category object
+        The category being fitted for (see categoriesDef.py).
+    centralVal: float
+        The scale factor for the MC muon pt.
+    scale: float
+        The relative uncertainty on the muon pt scale.
     epsilon: float
         Small weight given to duplicate events.
     """
