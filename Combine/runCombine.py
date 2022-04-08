@@ -1003,7 +1003,10 @@ def createHistograms(category):
         wVar = {}
         weights = {}
         if 'data' not in n:
-            weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
+            weights['ctrl1'], wVar['ctrl1Up'], wVar['ctrl1Down'] = get_ctrl_weights(ds,0,1)
+            weights['ctrl2'], wVar['ctrl2Up'], wVar['ctrl2Down'] = get_ctrl_weights(ds,1,2)
+            weights['ctrl3'], wVar['ctrl3Up'], wVar['ctrl3Down'] = get_ctrl_weights(ds,2,3)
+            weights['ctrl4'], wVar['ctrl4Up'], wVar['ctrl4Down'] = get_ctrl_weights(ds,3,4)
         if n == 'dataSS_DstMu':
             nTotSelected = ds['q2'].shape[0]
             nTotExp = ds['q2'].shape[0]
@@ -1463,7 +1466,10 @@ def createHistograms(category):
         wVar = {}
         weights = {}
         if 'data' not in n:
-            weights['ctrl'], wVar['ctrlUp'], wVar['ctrlDown'] = get_ctrl_weights(ds)
+            weights['ctrl1'], wVar['ctrl1Up'], wVar['ctrl1Down'] = get_ctrl_weights(ds,0,1)
+            weights['ctrl2'], wVar['ctrl2Up'], wVar['ctrl2Down'] = get_ctrl_weights(ds,1,2)
+            weights['ctrl3'], wVar['ctrl3Up'], wVar['ctrl3Down'] = get_ctrl_weights(ds,2,3)
+            weights['ctrl4'], wVar['ctrl4Up'], wVar['ctrl4Down'] = get_ctrl_weights(ds,3,4)
         if n == 'dataSS_DstMu':
             nTotExp = ds['q2'].shape[0]
         else:
@@ -2756,7 +2762,10 @@ def createSingleCard(histo, category, fitRegionsOnly=False):
             n = k[k.find('__')+2:-2]
             card += n+' shape' + mcProcStr*nCat + '\n'
 
-    card += 'ctrl shape' + mcProcStr*nCat + '\n'
+    card += 'ctrl1 shape' + mcProcStr*nCat + '\n'
+    card += 'ctrl2 shape' + mcProcStr*nCat + '\n'
+    card += 'ctrl3 shape' + mcProcStr*nCat + '\n'
+    card += 'ctrl4 shape' + mcProcStr*nCat + '\n'
 
     # B eta uncertainty
     names = []
