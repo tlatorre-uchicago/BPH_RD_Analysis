@@ -43,6 +43,67 @@ import root_numpy as rtnp
 
 import argparse
 
+class LRU_Cache:
+
+    def __init__(self, user_function, maxsize=1024):
+        # Link layout:     [PREV, NEXT, KEY, RESULT]
+        self.root = root = [None, None, None, None]
+        self.user_function = user_function
+        self.cache = cache = {}
+
+        last = root
+        for i in range(maxsize):
+            key = object()
+            cache[key] = last[1] = last = [last, root, key, None]
+        root[0] = last
+
+    def __call__(self, *key):
+        cache = self.cache
+        root = self.root
+        link = cache.get(key)
+        if link is not None:
+            link_prev, link_next, _, result = link
+            link_prev[1] = link_next
+            link_next[0] = link_prev
+            last = root[0]
+            last[1] = root[0] = link
+            link[0] = last
+            link[1] = root
+            return result
+        result = self.user_function(*key)
+        root[2] = key
+        root[3] = result
+        oldroot = root
+        root = self.root = root[1]
+        root[2], oldkey = None, root[2]
+        root[3], oldvalue = None, root[3]
+        del cache[oldkey]
+        cache[key] = oldroot
+
+
+def get_phis_etas_pts(e):
+    p = np.zeros(4,dtype=[('phi',float),('eta',float),('pt',float)])
+    for i, n in enumerate(['mu', 'pi', 'K', 'pis']):
+        p[i].phi = getattr(e, n+'_phi')
+        p[i].eta = getattr(e, n+'_eta')
+        p[i].pt = getattr(e, n+'_pt')
+    return p
+
+get_phis_etas_pts_memoized = LRU_Cache(get_phis_etas_pts,maxsize=10)
+
+@profile
+def detect_duplicate(e, phi, eta, pt):
+    #p = get_phis_etas_pts_memoized(e)
+    p = get_phis_etas_pts(e)
+    dphi = phi - p['phi']
+    dphi = np.where(dphi > np.pi, dphi - 2*np.pi, dphi)
+    dphi = np.where(dphi < np.pi, dphi + 2*np.pi, dphi)
+    dR = np.hypot(dphi, eta - p['eta'])
+    dPt = np.abs(p['pt'] - pt)/p['pt']
+    if np.any((dPt < 0.03) & (dR < 0.001)):
+        return True
+    return False
+
 parser = argparse.ArgumentParser()
 parser.add_argument ('--function', type=str, default='main', help='Function to perform')
 parser.add_argument ('-d', '--dataset', type=str, default=[], help='Dataset(s) to run on or regular expression for them', nargs='+')
@@ -457,18 +518,8 @@ def extractEventInfos(j, ev, corr=None):
         phi = ev.neuAdd_phi[jj]
         pdgId = ev.neuAdd_pdgId[jj]
 
-        #Avoid duplicates
-        duplicate = False
-        for n in ['mu', 'pi', 'K', 'pis']:
-            dphi = phi - getattr(e, n+'_phi')
-            if dphi > np.pi: dphi -= 2*np.pi
-            if dphi < -np.pi: dphi += 2*np.pi
-            dR = np.hypot(dphi, eta - getattr(e, n+'_eta'))
-            dPt = np.abs(getattr(e, n+'_pt') - pt)/getattr(e, n+'_pt')
-            if dPt < 0.03 and dR < 0.001:
-                duplicate=True
-                break
-        if duplicate:
+        # Avoid duplicates
+        if detect_duplicate(e,phi,eta,pt):
             continue
 
         if pdgId == 22: # photon
