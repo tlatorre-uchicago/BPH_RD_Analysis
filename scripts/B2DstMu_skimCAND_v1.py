@@ -79,22 +79,21 @@ class LRU_Cache:
         root[3], oldvalue = None, root[3]
         del cache[oldkey]
         cache[key] = oldroot
-
+        return result
 
 def get_phis_etas_pts(e):
     p = np.zeros(4,dtype=[('phi',float),('eta',float),('pt',float)])
     for i, n in enumerate(['mu', 'pi', 'K', 'pis']):
-        p[i].phi = getattr(e, n+'_phi')
-        p[i].eta = getattr(e, n+'_eta')
-        p[i].pt = getattr(e, n+'_pt')
+        p['phi'][i] = getattr(e, n+'_phi')
+        p['eta'][i] = getattr(e, n+'_eta')
+        p['pt'][i] = getattr(e, n+'_pt')
     return p
 
 get_phis_etas_pts_memoized = LRU_Cache(get_phis_etas_pts,maxsize=10)
 
 @profile
 def detect_duplicate(e, phi, eta, pt):
-    #p = get_phis_etas_pts_memoized(e)
-    p = get_phis_etas_pts(e)
+    p = get_phis_etas_pts_memoized(e)
     dphi = phi - p['phi']
     dphi = np.where(dphi > np.pi, dphi - 2*np.pi, dphi)
     dphi = np.where(dphi < np.pi, dphi + 2*np.pi, dphi)
@@ -559,7 +558,6 @@ def extractEventInfos(j, ev, corr=None):
 
     return e
 
-@profile
 def makeSelection(inputs):
     n, tag, filepath, leafs_names, cat, idxInt, corr, skipCut, trkControlRegion, serial = inputs
     N_accepted_cand = []
