@@ -148,8 +148,9 @@ def getPolyCorrection(hNum, hDen, deg, tag, verbose=False):
 
 
 # # Load MC
-mcSample = DSetLoader('Bd_JpsiKst_General', candDir='ntuples_Bd2JpsiKst_220328', skimmedTag=args.skimTag)
+mcSample = DSetLoader('Bd_JpsiKst_General', candDir='ntuples_Bd2JpsiKst_220407', skimmedTag=args.skimTag)
 dsetMC_loc = mcSample.skimmed_dir + '/{}_corr.root'.format(cat.name)
+print dsetMC_loc
 dfMC = pd.DataFrame(rtnp.root2array(dsetMC_loc))
 
 
@@ -251,7 +252,7 @@ CMS_lumi.integrated_lumi = lumi_tot
 
 
 
-dsetRD_loc = dataLoc+'cmsRD/skimmed'+args.skimTag+'/B2JpsiKst_220328_{}_corr.root'.format(cat.name)
+dsetRD_loc = dataLoc+'cmsRD/skimmed'+args.skimTag+'/B2JpsiKst_220407_{}_corr.root'.format(cat.name)
 dfRD = pd.DataFrame(rtnp.root2array(dsetRD_loc))
 N_sel_per_fb = float(dfRD.shape[0])/lumi_tot
 print 'Selected events per fb: {:.0f}'.format(N_sel_per_fb)
@@ -259,10 +260,10 @@ print 'Selected events per fb: {:.0f}'.format(N_sel_per_fb)
 # # Clean sets
 cuts = [
     ['trgMu_eta', [-0.8, 0.8]],
-    ['pi_lostInnerHits', [-2, 1]],
-    ['K_lostInnerHits', [-2, 1]],
-    ['mup_lostInnerHits', [-2, 1]],
-    ['mum_lostInnerHits', [-2, 1]],
+    #['pi_lostInnerHits', [-2, 1]],
+    #['K_lostInnerHits', [-2, 1]],
+    #['mup_lostInnerHits', [-2, 1]],
+    #['mum_lostInnerHits', [-2, 1]],
     ['pi_pt', [2., 800]],
     ['K_pt', [2., 800]],
     [mB_var, [5.24, 5.32]],

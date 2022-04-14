@@ -162,6 +162,7 @@ def insertOrdered(list, el):
         # list = list[:il] + [el] + list[il:]
         return il, list[:il] + [el] + list[il:]
 
+@profile
 def extractEventInfos(j, ev, corr=None):
     m_mu   = 0.105658
     m_pi   = 0.139570
@@ -442,14 +443,18 @@ def extractEventInfos(j, ev, corr=None):
     e.massMuNeu = []
 
     p4_sumGoodNeu = rt.TLorentzVector()
-    for jj in range(idx_st, idx_stop):
+    for jj in sorted(range(idx_st, idx_stop),key=lambda x: ev.neuAdd_pt[x],reverse=True):
+        pt = ev.neuAdd_pt[jj]
+
+        # Some events have a lot of neutrals, so we try to break out early if
+        # we already have the three highest pt neutrals.
+        if len(e.neuPt) >= 3 and pt < e.neuPt[2]:
+            continue
 
         eta = ev.neuAdd_eta[jj]
         if np.abs(eta) >= 2.4:
             continue
         phi = ev.neuAdd_phi[jj]
-        pt = ev.neuAdd_pt[jj]
-
         pdgId = ev.neuAdd_pdgId[jj]
 
         #Avoid duplicates
@@ -503,6 +508,7 @@ def extractEventInfos(j, ev, corr=None):
 
     return e
 
+@profile
 def makeSelection(inputs):
     n, tag, filepath, leafs_names, cat, idxInt, corr, skipCut, trkControlRegion, serial = inputs
     N_accepted_cand = []

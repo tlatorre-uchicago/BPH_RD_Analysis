@@ -54,12 +54,12 @@ args = parser.parse_args()
 ####                          Datset declaration                         ####
 #############################################################################
 MCloc = '/storage/af/group/rdst_analysis/BPhysics/data/cmsMC/'
-MCend = '/ntuples_Bd2JpsiKst_220328/out_CAND_*.root'
+MCend = '/ntuples_Bd2JpsiKst_220407/out_CAND_*.root'
 RDloc = '/storage/af/group/rdst_analysis/BPhysics/data/cmsRD/ParkingBPH*/'
 
 filesLocMap = {
 'MC'    : MCloc+'CP_General_BdToJpsiKstar_BMuonFilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen'+MCend,
-'data'  : RDloc+'Run2018D-05May2019promptD-v1_RDntuplizer_Bd2JpsiKst_220328_CAND.root',
+'data'  : RDloc+'Run2018D-05May2019promptD-v1_RDntuplizer_Bd2JpsiKst_220407/out_CAND*.root',
 }
 
 def getTLVfromField(ev, n, idx, mass):
@@ -374,15 +374,15 @@ def makeSelection(inputs):
                    evEx.trgMu_pt, evEx.trgMu_eta, evEx.trgMu_sigdxy,
                    evEx.otherMu_pt, evEx.otherMu_eta, evEx.otherMu_phi,
                    evEx.mum_pt, evEx.mum_eta, evEx.mum_phi,
-                   ev.mum_dxy_PV[j], ev.mum_lostInnerHits[j],
+                   ev.mum_dxy_PV[j],# ev.mum_lostInnerHits[j],
                    evEx.mup_pt, evEx.mup_eta, evEx.mup_phi,
-                   ev.mup_dxy_PV[j], ev.mup_lostInnerHits[j],
+                   ev.mup_dxy_PV[j],# ev.mup_lostInnerHits[j],
                    ev.pval_mumu[j], evEx.mass_mumu,
                    evEx.Jpsi_pt, evEx.Jpsi_eta, ev.cosT_Jpsi_PV[j],
                    evEx.K_pt, evEx.K_eta, evEx.K_phi,
-                   ev.K_sigdxy_PV[j], ev.K_lostInnerHits[j],
+                   ev.K_sigdxy_PV[j],# ev.K_lostInnerHits[j],
                    evEx.pi_pt, evEx.pi_eta, evEx.pi_phi,
-                   ev.pi_sigdxy_PV[j], ev.pi_lostInnerHits[j],
+                   ev.pi_sigdxy_PV[j],# ev.pi_lostInnerHits[j],
                    ev.pval_piK[j], evEx.mass_piK, evEx.mass_Kpi, evEx.mass_KK,
                    evEx.Kst_pt, evEx.Kst_eta, evEx.Kst_pt, ev.sigdxy_vtxKst_PV[j],
                    ev.pval_mumupiK[j],
@@ -524,15 +524,15 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], maxEvents=
                         'trgMu_pt', 'trgMu_eta', 'trgMu_sigdxy',
                         'otherMu_pt', 'otherMu_eta', 'otherMu_phi',
                         'mum_pt', 'mum_eta', 'mum_phi',
-                        'mum_dxy', 'mum_lostInnerHits',
+                        'mum_dxy',# 'mum_lostInnerHits',
                         'mup_pt', 'mup_eta', 'mup_phi',
-                        'mup_dxy', 'mup_lostInnerHits',
+                        'mup_dxy',# 'mup_lostInnerHits',
                         'pval_mumu', 'mass_mumu',
                         'Jpsi_pt', 'Jpsi_eta', 'cosT_Jpsi_PV',
                         'K_pt','K_eta','K_phi',
-                        'K_sigdxy_PV', 'K_lostInnerHits',
+                        'K_sigdxy_PV',# 'K_lostInnerHits',
                         'pi_pt','pi_eta','pi_phi',
-                        'pi_sigdxy_PV', 'pi_lostInnerHits',
+                        'pi_sigdxy_PV',# 'pi_lostInnerHits',
                         'pval_piK', 'mass_piK', 'mass_Kpi', 'mass_KK',
                         'Kst_pt', 'Kst_eta', 'Kst_phi', 'sigdxy_vtxKst_PV',
                         'pval_mumupiK', 'mass_mumupiK',

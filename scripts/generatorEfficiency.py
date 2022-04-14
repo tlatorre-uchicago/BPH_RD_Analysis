@@ -107,28 +107,28 @@ inDic = {}
 
 
 ######## Signals
-inDic['Bd_MuNuDst'] = DSetLoader('Bd_MuNuDst', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bd_TauNuDst'] = DSetLoader('Bd_TauNuDst', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_MuNuDst'] = DSetLoader('Bd_MuNuDst', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_TauNuDst'] = DSetLoader('Bd_TauNuDst', candDir='ntuples_B2DstMu_mediumId')
 ######## D** background
-inDic['Bu_MuDstPi'] = DSetLoader('Bu_MuNuDstPi', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bd_MuDstPi'] = DSetLoader('Bd_MuNuDstPi', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bu_MuDstPi'] = DSetLoader('Bu_MuNuDstPi', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_MuDstPi'] = DSetLoader('Bd_MuNuDstPi', candDir='ntuples_B2DstMu_mediumId')
 # inDic['Bd_MuDstPiPi'] = DSetLoader('Bd_MuNuDstPiPi', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bu_MuDstPiPi'] = DSetLoader('Bu_MuNuDstPiPi', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bd_MuDstPiPi_v2'] = DSetLoader('Bd_MuNuDstPiPi_v2', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bu_TauDstPi'] = DSetLoader('Bu_TauNuDstPi', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bd_TauDstPi'] = DSetLoader('Bd_TauNuDstPi', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bd_TauDstPiPi'] = DSetLoader('Bd_TauNuDstPiPi', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bu_TauDstPiPi'] = DSetLoader('Bu_TauNuDstPiPi', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bs_MuDstK'] = DSetLoader('Bs_MuNuDstK', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bs_TauDstK'] = DSetLoader('Bs_TauNuDstK', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bu_MuDstPiPi'] = DSetLoader('Bu_MuNuDstPiPi', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_MuDstPiPi_v2'] = DSetLoader('Bd_MuNuDstPiPi_v2', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bu_TauDstPi'] = DSetLoader('Bu_TauNuDstPi', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_TauDstPi'] = DSetLoader('Bd_TauNuDstPi', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_TauDstPiPi'] = DSetLoader('Bd_TauNuDstPiPi', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bu_TauDstPiPi'] = DSetLoader('Bu_TauNuDstPiPi', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bs_MuDstK'] = DSetLoader('Bs_MuNuDstK', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bs_TauDstK'] = DSetLoader('Bs_TauNuDstK', candDir='ntuples_B2DstMu_mediumId')
 
 ######## D*Hc background
-inDic['Bd_DstDu'] = DSetLoader('Bd_DstDu', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bd_DstDd'] = DSetLoader('Bd_DstDd', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bd_DstDs'] = DSetLoader('Bd_DstDs', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bu_DstDu'] = DSetLoader('Bu_DstDu', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bu_DstDd'] = DSetLoader('Bu_DstDd', candDir='ntuples_B2DstMu_mediumId')
-inDic['Bs_DstDs'] = DSetLoader('Bs_DstDs', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_DstDu'] = DSetLoader('Bd_DstDu', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_DstDd'] = DSetLoader('Bd_DstDd', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bd_DstDs'] = DSetLoader('Bd_DstDs', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bu_DstDu'] = DSetLoader('Bu_DstDu', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bu_DstDd'] = DSetLoader('Bu_DstDd', candDir='ntuples_B2DstMu_mediumId')
+#inDic['Bs_DstDs'] = DSetLoader('Bs_DstDs', candDir='ntuples_B2DstMu_mediumId')
 
 ######## Others background
 # inDic['DstKu_KuToMu'] = DSetLoader('DstKu_KuToMu', candDir='ntuples_B2DstMu_211118')
@@ -137,7 +137,7 @@ inDic['Bs_DstDs'] = DSetLoader('Bs_DstDs', candDir='ntuples_B2DstMu_mediumId')
 # In[10]:
 
 
-# inDic['JPsiKst'] = DSetLoader('Bd_JpsiKst_General', candDir='ntuples_B2JpsiKst')
+inDic['JPsiKst'] = DSetLoader('Bd_JpsiKst_General', candDir='ntuples_Bd2JpsiKst_220407')
 
 
 # In[11]:
@@ -341,7 +341,9 @@ for d in inDic.values():
     print '\n\n--> ' + d.sample
 
     if not os.path.isdir(d.ntuples_dir):
+        print "not directory"
         continue
+    print "here"
     cand_out_list = glob(os.path.join(d.ntuples_dir,'out/job*.out'))
 #     if d.sample == 'Bd_MuNuDst':
 #         cand_out_list = glob(os.path.join(d.ntuples_dir,'out/job_???_*.out'))
@@ -412,7 +414,8 @@ for d in inDic.values():
             r *= 1e12 #GeV -> meV
             d.rate[str(k)] = r
         print 'Done'
-    except:
+    except Exception as e:
+        print(e)
         print 'Not found'
     
     dump_dic = {'nTotMINIAOD': int(d.nTotMINIAOD), 'nTotCAND': int(d.nTotCAND)}
