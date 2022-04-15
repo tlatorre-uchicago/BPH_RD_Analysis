@@ -32,7 +32,7 @@ def trigger_selection(iMu, ev, cat, muPt, muEta):
         return False
     return True
 
-def quick_category_selection(j, ev, cat):
+def quick_category_selection(j, ev, evEx, cat):
     passed = [False, False]
     if ev.mup_isTrg[j] >= 0:
         passed[0] = trigger_selection(int(ev.mup_isTrg[j]), ev, cat, evEx.mup_pt, evEx.mup_eta)
