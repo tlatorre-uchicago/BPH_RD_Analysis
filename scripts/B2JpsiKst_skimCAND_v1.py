@@ -43,7 +43,7 @@ parser.add_argument ('-p', '--parallelType', choices=['pool', 'jobs', 'serial', 
 parser.add_argument ('--maxEvents', type=int, default=1e15, help='Max number of events to be processed')
 parser.add_argument ('--recreate', default=False, action='store_true', help='Recreate even if file already present')
 parser.add_argument ('--applyCorr', default=True, type=str2bool, help='Switch to apply crrections')
-parser.add_argument ('--cat', type=str, default=['low', 'mid', 'high'], choices=['single', 'low', 'mid', 'high', 'probe', 'none'], help='Category(ies)', nargs='+')
+parser.add_argument ('-c','--cat', type=str, default=['low', 'mid', 'high'], choices=['single', 'low', 'mid', 'high', 'probe', 'none'], help='Category(ies)', nargs='+')
 parser.add_argument ('--skipCut', type=str, default='', choices=['all', '7'], help='Cut to skip')
 ######## Arguments not for user #####################
 parser.add_argument ('--tmpDir', type=str, default=None, help='Temporary directory')

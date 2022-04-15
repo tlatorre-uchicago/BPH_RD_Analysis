@@ -112,7 +112,7 @@ parser.add_argument ('--maxEvents', type=int, default=1e15, help='Max number of 
 parser.add_argument ('--recreate', default=False, action='store_true', help='Recreate even if file already present')
 parser.add_argument ('--applyCorr', default=False, action='store_true', help='Switch to apply crrections')
 parser.add_argument ('--region', type=str, default='all', choices=['signal', 'trkControl', 'all'], help='Region to skim: signal (0 tracks) or track control (1+)')
-parser.add_argument ('--cat', type=str, default=['high', 'mid', 'low'], choices=['single', 'low', 'mid', 'high', 'none'], help='Category(ies)', nargs='+')
+parser.add_argument ('-c','--cat', type=str, default=['high', 'mid', 'low'], choices=['single', 'low', 'mid', 'high', 'none'], help='Category(ies)', nargs='+')
 parser.add_argument ('--skipCut', type=str, default='', choices=['all', '11', '13', '14', '16', '17'], help='Cut to skip.\nAll: skip all the cuts\n16:Visible mass cut\n17: additional tracks cut')
 ######## Arguments not for user #####################
 parser.add_argument ('--tmpDir', type=str, default=None, help='Temporary directory')
