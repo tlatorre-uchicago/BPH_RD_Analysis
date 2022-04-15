@@ -325,29 +325,29 @@ def extractEventInfos(j, ev, corr=None):
     idx_stop = int(idx_st + ev.nTksAdd[j])
 
     e.N_goodAddTks = 0
-    e.tkCharge = []
-    e.tkPdgId = []
-    e.tkPt = []
-    e.tkPtError = []
-    e.tkEta = []
-    e.tkPhi = []
-    e.tk_lostInnerHits = []
-    e.tk_pval = []
-    e.tk_sigIP3D_vtxB = []
-    e.MC_tkFlag = []
-    e.MC_tkFromMainB = []
-    e.MC_tkPdgId = []
-    e.MC_tk_dphi = []
-    e.MC_tk_deta = []
-    e.MC_tk_dpt = []
-    e.MC_tkMotherPdgId = []
-    e.MC_tkMotherMotherPdgId = []
-    e.massVis_wTk = []
-    e.massHad_wTk = []
-    e.massMuTk = []
-    e.massDTk = []
-    e.mass2MissTk = []
-    e.UmissTk = []
+    e.tkCharge = [0,0,0]
+    e.tkPdgId = [0,0,0]
+    e.tkPt = [0,0,0]
+    e.tkPtError = [0,0,0]
+    e.tkEta = [0,0,0]
+    e.tkPhi = [0,0,0]
+    e.tk_lostInnerHits = [0,0,0]
+    e.tk_pval = [0,0,0]
+    e.tk_sigIP3D_vtxB = [0,0,0]
+    e.MC_tkFlag = [0,0,0]
+    e.MC_tkFromMainB = [0,0,0]
+    e.MC_tkPdgId = [0,0,0]
+    e.MC_tk_dphi = [0,0,0]
+    e.MC_tk_deta = [0,0,0]
+    e.MC_tk_dpt = [0,0,0]
+    e.MC_tkMotherPdgId = [0,0,0]
+    e.MC_tkMotherMotherPdgId = [0,0,0]
+    e.massVis_wTk = [0,0,0]
+    e.massHad_wTk = [0,0,0]
+    e.massMuTk = [0,0,0]
+    e.massDTk = [0,0,0]
+    e.mass2MissTk = [0,0,0]
+    e.UmissTk = [0,0,0]
 
     p4_sumGoodTks = rt.TLorentzVector()
     p4_tks = []
@@ -476,14 +476,6 @@ def extractEventInfos(j, ev, corr=None):
 
     e.M2missTks = (p4_BwTks - p4_vis_wTks).M2()
     e.q2Tks = (p4_BwTks - p4_Dst - p4_sumGoodTks).M2()
-
-
-    if e.N_goodAddTks < 3:
-        auxList = [e.tkCharge, e.tkPdgId, e.tkPt, e.tkPtError, e.tkEta, e.tkPhi, e.tk_lostInnerHits, e.tk_pval, e.tk_sigIP3D_vtxB, e.massVis_wTk, e.massHad_wTk, e.massMuTk, e.massDTk, e.mass2MissTk, e.UmissTk]
-        auxList += [e.MC_tkFlag, e.MC_tkFromMainB, e.MC_tkPdgId, e.MC_tkMotherPdgId, e.MC_tkMotherMotherPdgId, e.MC_tk_dphi, e.MC_tk_deta, e.MC_tk_dpt]
-        for l in auxList:
-            l += [0, 0, 0]
-
 
     #----------------- Additional neutrals -------------------#
     idx_st = 0
