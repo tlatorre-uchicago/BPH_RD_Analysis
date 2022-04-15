@@ -31,7 +31,7 @@ from cebefo_style import Set_2D_colz_graphics
 from gridVarQ2Plot import col_dic, plot_gridVarQ2
 from progressBar import ProgressBar
 from categoriesDef import categories
-from Bd2JpsiKst_selection import candidate_selection, category_selection, quick_category_selection
+from Bd2JpsiKst_selection import candidate_selection, category_selection
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -319,7 +319,6 @@ def extractEventInfos(j, ev, corr=None):
 
     return e
 
-@profile
 def makeSelection(inputs):
     n, tag, filepath, leafs_names, cat, idxInt, corr, skipCut, serial = inputs
     N_accepted_cand = []
@@ -367,14 +366,10 @@ def makeSelection(inputs):
                 e.mum_eta = ev.mumRefit_eta[j]
                 e.mum_phi = ev.mumRefit_phi[j]
                 e.mum_pt = correctPt(ev.mumRefit_pt[j], e.mum_eta, e.mum_phi, corr, 3e-3)
-                if not quick_category_selection(j, ev, e, cat):
+                if not category_selection(j, ev, e, cat):
                     continue
 
             evEx = extractEventInfos(j, ev, corr)
-
-            if not cat is None:
-                if not category_selection(j, ev, evEx, cat, True):
-                    continue
 
             if not skipCut == 'all':
                 if not candidate_selection(j, ev, evEx, skipCut):
