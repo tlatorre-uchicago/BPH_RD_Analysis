@@ -358,7 +358,7 @@ def makeSelection(inputs):
 
         ev_output = []
         for j in range(ev.pval_piK.size()):
-            if not cat is None:
+            if cat is not None:
                 e = Container()
                 e.mup_eta = ev.mupRefit_eta[j]
                 e.mup_phi = ev.mupRefit_phi[j]
