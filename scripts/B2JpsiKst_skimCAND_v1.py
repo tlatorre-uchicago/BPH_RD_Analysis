@@ -358,6 +358,10 @@ def makeSelection(inputs):
 
         ev_output = []
         for j in range(ev.pval_piK.size()):
+            if not cat is None:
+                if not quick_category_selection(j, ev, cat):
+                    continue
+
             evEx = extractEventInfos(j, ev, corr)
 
             if not cat is None:

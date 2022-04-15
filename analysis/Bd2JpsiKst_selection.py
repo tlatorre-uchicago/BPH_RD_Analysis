@@ -32,6 +32,14 @@ def trigger_selection(iMu, ev, cat, muPt, muEta):
         return False
     return True
 
+def quick_category_selection(j, ev, cat):
+    passed = [False, False]
+    if ev.mup_isTrg[j] >= 0:
+        passed[0] = trigger_selection(int(ev.mup_isTrg[j]), ev, cat, evEx.mup_pt, evEx.mup_eta)
+    if ev.mum_isTrg[j] >= 0:
+        passed[1] = trigger_selection(int(ev.mum_isTrg[j]), ev, cat, evEx.mum_pt, evEx.mum_eta)
+    return np.sum(passed) > 0
+
 def category_selection(j, ev, evEx, cat, saveTrgMu=False):
     idxTrigger = []
     if cat == 'probe':
