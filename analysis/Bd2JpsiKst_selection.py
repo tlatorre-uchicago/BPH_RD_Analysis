@@ -12,6 +12,7 @@ def exclusiveTrigger(j, ev, trgAcc, trgNegate = []):
                 return False
     return True
 
+@profile
 def trigger_selection(iMu, ev, cat, muPt, muEta):
     if ev.trgMu_L1_dR[iMu] > 0.5:
         return False
@@ -32,6 +33,7 @@ def trigger_selection(iMu, ev, cat, muPt, muEta):
         return False
     return True
 
+@profile
 def quick_category_selection(j, ev, evEx, cat):
     passed = [False, False]
     if ev.mup_isTrg[j] >= 0:
