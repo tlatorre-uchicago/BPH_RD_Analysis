@@ -91,7 +91,7 @@ def get_phis_etas_pts(e):
 
 get_phis_etas_pts_memoized = LRU_Cache(get_phis_etas_pts,maxsize=10)
 
-@profile
+#@profile
 def detect_duplicate(e, phi, eta, pt):
     p = get_phis_etas_pts_memoized(e)
     dphi = phi - p['phi']
@@ -222,7 +222,7 @@ def insertOrdered(list, el):
         # list = list[:il] + [el] + list[il:]
         return il, list[:il] + [el] + list[il:]
 
-@profile
+#@profile
 def extractEventInfos(j, ev, corr=None):
     m_mu   = 0.105658
     m_pi   = 0.139570
