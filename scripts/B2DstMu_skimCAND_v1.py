@@ -367,19 +367,11 @@ def extractEventInfos(j, ev, corr=None):
         # if pt < 1.0:
         if pt < 0.55:
             continue
+
         #Avoid tracks duplicates
-        duplicate = False
-        for n in ['mu', 'pi', 'K', 'pis']:
-            dphi = phi - getattr(e, n+'_phi')
-            if dphi > np.pi: dphi -= 2*np.pi
-            if dphi < -np.pi: dphi += 2*np.pi
-            dR = np.hypot(dphi, eta - getattr(e, n+'_eta'))
-            dPt = np.abs(getattr(e, n+'_pt') - pt)/getattr(e, n+'_pt')
-            if dPt < 0.03 and dR < 0.001:
-                duplicate=True
-                break
-        if duplicate:
+        if detect_duplicate(e,phi,eta,pt):
             continue
+
         #
         p4_tk = rt.TLorentzVector()
         p4_tk.SetPtEtaPhiM(pt, eta, phi, m_pi)
