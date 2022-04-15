@@ -576,11 +576,15 @@ def makeSelection(inputs):
         ev_output = []
         for j in range(ev.pval_piK.size()):
             idxTrg = int(ev.mu_trgMu_idx[j]) if hasattr(ev, 'mu_trgMu_idx') else int(ev.mu_trgCand_idx[j])
-            evEx = extractEventInfos(j, ev, corr)
 
             if not cat is None:
-                if not trigger_selection(idxTrg, ev, evEx, cat):
+                mu_eta = ev.mu_refitD0pismu_eta[j]
+                mu_phi = ev.mu_refitD0pismu_phi[j]
+                mu_pt = correctPt(ev.mu_refitD0pismu_pt[j], mu_eta, mu_phi, corr, 3e-3)
+                if not trigger_selection(idxTrg, ev, mu_pt, cat):
                     continue
+
+            evEx = extractEventInfos(j, ev, corr)
 
             if not skipCut == 'all':
                 if not candidate_selection(j, ev, evEx, skipCut, trkControlRegion):
