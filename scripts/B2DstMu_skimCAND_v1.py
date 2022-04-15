@@ -542,6 +542,7 @@ def extractEventInfos(j, ev, corr=None):
 
     return e
 
+#@profile
 def makeSelection(inputs):
     n, tag, filepath, leafs_names, cat, idxInt, corr, skipCut, trkControlRegion, serial = inputs
     N_accepted_cand = []
