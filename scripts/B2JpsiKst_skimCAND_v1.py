@@ -366,10 +366,17 @@ def makeSelection(inputs):
                 e.mum_eta = ev.mumRefit_eta[j]
                 e.mum_phi = ev.mumRefit_phi[j]
                 e.mum_pt = correctPt(ev.mumRefit_pt[j], e.mum_eta, e.mum_phi, corr, 3e-3)
-                if not category_selection(j, ev, e, cat):
+                if not category_selection(j, ev, e, cat, True):
                     continue
 
             evEx = extractEventInfos(j, ev, corr)
+
+            evEx.trgMu_pt = e.mup_pt
+            evEx.trgMu_eta = e.mup_eta
+            evEx.trgMu_sigdxy = ev.trgMu_sigdxy_BS[int(ev.mup_isTrg[j])]
+            evEx.otherMu_pt = e.mum_pt
+            evEx.otherMu_eta = e.mum_eta
+            evEx.otherMu_phi = e.mum_phi
 
             if not skipCut == 'all':
                 if not candidate_selection(j, ev, evEx, skipCut):
