@@ -322,7 +322,7 @@ def analyzeBin(idx, verbose=False):
     # suggests that applying these cuts here can introduce a bias in the
     # trigger scale factors.
     #selPass = np.logical_and(selTot, l1Matching)
-    ptThr = float(re.search('Mu[0-9]+_', probeTrigger).group(0)[2:-1])
+    #ptThr = float(re.search('Mu[0-9]+_', probeTrigger).group(0)[2:-1])
     #selPass = np.logical_and(selPass, df['mProbe_L1_pt'] > ptThr)
     #selPass = np.logical_and(selPass, np.abs(df['mProbe_L1_eta']) < 1.5)
     selPass = np.logical_and(selPass, df['mProbe_' + probeTrigger] == 1)
