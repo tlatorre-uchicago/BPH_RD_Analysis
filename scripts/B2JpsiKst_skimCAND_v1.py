@@ -479,11 +479,11 @@ def create_dSet(n, filepath, cat, applyCorrections=False, skipCut=[], maxEvents=
     print n, catName
     if 'data' in n:
         loc = '/storage/af/group/rdst_analysis/BPhysics/data/cmsRD/skimmed'+args.skimTag+'/B2JpsiKst'+ n.replace('data', '')
-        out = re.search('2[12][01][1-9][0-3][0-9]', filepath)
+        out = re.search('RDntuplizer_.*?_(.*)/', filepath)
         if out is None:
             print filepath
             raise
-        fskimmed_name = loc + '_' + out.group(0) + '_' + catName
+        fskimmed_name = loc + '_' + out.group(1) + '_' + catName
         N_evts_per_job = 40000
     else:
         d = os.path.dirname(filepath) + '/skimmed'+args.skimTag+'/'
