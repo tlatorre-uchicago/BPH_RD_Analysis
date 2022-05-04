@@ -318,17 +318,11 @@ def analyzeBin(idx, verbose=False):
     ## Require L1 mathing
     # dptRel = np.abs(df['mProbe_L1_pt']/df['mProbe_pt']) - 1
     l1Matching = np.logical_and(df['mProbe_L1_pt'] > 0, df['mProbe_L1_dR'] < 0.5)
-    # Don't apply the L1 cuts. I wrote a quick trigger simulation toy MC which
-    # suggests that applying these cuts here can introduce a bias in the
-    # trigger scale factors.
-    #selPass = np.logical_and(selTot, l1Matching)
-    #ptThr = float(re.search('Mu[0-9]+_', probeTrigger).group(0)[2:-1])
-    #selPass = np.logical_and(selPass, df['mProbe_L1_pt'] > ptThr)
-    #selPass = np.logical_and(selPass, np.abs(df['mProbe_L1_eta']) < 1.5)
+    selPass = np.logical_and(selTot, l1Matching)
+    ptThr = float(re.search('Mu[0-9]+_', probeTrigger).group(0)[2:-1])
+    selPass = np.logical_and(selPass, df['mProbe_L1_pt'] > ptThr)
+    selPass = np.logical_and(selPass, np.abs(df['mProbe_L1_eta']) < 1.5)
     selPass = np.logical_and(selPass, df['mProbe_' + probeTrigger] == 1)
-
-    # selPass = np.logical_and(selTot, df['mProbe_' + probeTrigger] == 1)
-
 
     if verbose:
         print ' --- Total ---'
